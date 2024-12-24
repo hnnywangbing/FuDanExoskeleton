@@ -35,9 +35,9 @@
 #define MSG_TYPE3 "std_msgs/String"
 #define MSG_CLASS3 std_msgs::String
  
-#include <swarm_ros_bridge/CmdMessage.h>
+#include <FdExoskeleton/CmdMessage.h>
 #define MSG_TYPE4 "swarm_ros_bridge/CmdMessage"
-#define MSG_CLASS4 swarm_ros_bridge::CmdMessage
+#define MSG_CLASS4 FdExoskeleton::CmdMessage
 
 #include <sensor_msgs/JointState.h>
 #define MSG_TYPE5 "sensor_msgs/JointState"

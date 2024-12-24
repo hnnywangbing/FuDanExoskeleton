@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rospy
 from std_msgs.msg import String
-from swarm_ros_bridge.msg import CmdMessage
+from FdExoskeleton.msg import CmdMessage
 from std_msgs.msg import String
 moveCmd = rospy.Publisher('moveCmd', String, queue_size=10)
 modeCmd = rospy.Publisher('modeCmd', String, queue_size=10)

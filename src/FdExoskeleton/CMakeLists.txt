@@ -50,8 +50,10 @@ target_link_libraries(bridge_node
 )
 
 catkin_package(
+  LIBRARIES FdExoskeleton
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
   CATKIN_DEPENDS roscpp std_msgs geometry_msgs sensor_msgs message_runtime
+  DEPENDS system_libs
 )
 
 # 安装脚本

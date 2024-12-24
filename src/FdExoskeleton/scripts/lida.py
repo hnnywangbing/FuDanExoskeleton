@@ -7,7 +7,7 @@ import keyboard
 from datetime import datetime
 import rospy
 import traceback
-from swarm_ros_bridge.msg import CmdMessage
+from FdExoskeleton.msg import CmdMessage
 import numpy as np
 def convert_rostime_to_int64(dt):
       # 将 datetime 对象转换为 rospy.Time 对象
