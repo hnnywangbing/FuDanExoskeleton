@@ -194,9 +194,12 @@ sudo chmod 666 /dev/ttyUSB1
 
 
 catkin build
-mkdir  devel/lib/FdExoskeleton/
-cp build/FdExoskeleton/bridge_node  devel/lib/FdExoskeleton/
-source devel/setup.bash
+# mkdir  devel/lib/FdExoskeleton/
+# cp build/FdExoskeleton/bridge_node  devel/lib/FdExoskeleton/
+# source devel/setup.bash
+
+source install/setup.bash
+
 roslaunch FdExoskeleton ros_bridge.launch
 
 rosrun FdExoskeleton talker.py

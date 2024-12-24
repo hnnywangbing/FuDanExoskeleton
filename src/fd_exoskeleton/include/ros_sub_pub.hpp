@@ -43,11 +43,6 @@
 #define MSG_TYPE5 "sensor_msgs/JointState"
 #define MSG_CLASS5 sensor_msgs::JointState
 
-// #include <std_msgs/String.h>
-// #define MSG_TYPE6 "std_msgs/String"
-// #define MSG_CLASS6 std_msgs::String
-
- 
 
 // #include <xxx/yy.h>
 // #define MSG_TYPE4 "xxx/yy"

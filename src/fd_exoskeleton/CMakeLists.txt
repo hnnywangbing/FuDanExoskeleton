@@ -47,14 +47,13 @@ target_link_libraries(bridge_node
   ${catkin_LIBRARIES}
   ${ZMQ_LIBRARIES}
   ${libzmqpp}
-  ${Boost_LIBRARIES}
 )
 
 # 在target_link_libraries之后添加
 set_target_properties(bridge_node PROPERTIES INSTALL_RPATH "/usr/lib/x86_64-linux-gnu")
 
 catkin_package(
-  INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
+  INCLUDE_DIRS include
   CATKIN_DEPENDS roscpp std_msgs geometry_msgs sensor_msgs message_runtime
 )
 
