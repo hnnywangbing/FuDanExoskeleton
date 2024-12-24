@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rospy
 from std_msgs.msg import String
-from FdExoskeleton.msg import CmdMessage
+from fd_exoskeleton.msg import CmdMessage
 def callback(data):
     # 使用 f-string 格式化字符串
     rospy.loginfo(f'cmd: {data.cmd} value{data.value}')

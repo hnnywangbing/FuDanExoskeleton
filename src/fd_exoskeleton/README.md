@@ -180,23 +180,31 @@ Some applications:
 
 ![img1](pictures/img1.png)
 
+
+
+
+
+
+
+
 #配置传感器端口：查看端口ls /dev/ttyUSB*
 
 #端口授权
 sudo chmod 666 /dev/ttyUSB1
 
 
-catkin_make
-cp build/swarm_ros_bridge/bridge_node devel/lib/swarm_ros_bridge/
+catkin build
+mkdir  devel/lib/FdExoskeleton/
+cp build/FdExoskeleton/bridge_node  devel/lib/FdExoskeleton/
 source devel/setup.bash
-roslaunch swarm_ros_bridge latency_test.launch
+roslaunch FdExoskeleton ros_bridge.launch
 
-rosrun swarm_ros_bridge talker.py
+rosrun FdExoskeleton talker.py
 
-chmod +x src/swarm_ros_bridge/scripts/Imu.py
+chmod +x src/FdExoskeleton/scripts/Imu.py
 
-rosrun swarm_ros_bridge Imu.py
+rosrun FdExoskeleton Imu.py
 
-chmod +x src/swarm_ros_bridge/scripts/lada.py
+chmod +x src/FdExoskeleton/scripts/lida.py
 
-rosrun swarm_ros_bridge lida.py
+rosrun FdExoskeleton lida.py

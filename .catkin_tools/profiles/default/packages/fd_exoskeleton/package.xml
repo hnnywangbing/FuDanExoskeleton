@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>FdExoskeleton</name>
+  <name>fd_exoskeleton</name>
   <version>1.0.0</version>
-  <description>The FdExoskeleton package</description>
+  <description>The fd_exoskeleton package</description>
 
   <maintainer email="shupeixuan@qq.com">shupeixuan</maintainer>
 

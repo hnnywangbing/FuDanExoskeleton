@@ -11,7 +11,7 @@ import struct
 import time
 import platform
 import transforms3d as tfs #pip install transforms3d -i https://pypi.tuna.tsinghua.edu.cn/simple
-from FdExoskeleton.msg import CmdMessage
+from fd_exoskeleton.msg import CmdMessage
 import traceback
 from serial import EIGHTBITS, PARITY_NONE, STOPBITS_ONE
 from datetime import datetime

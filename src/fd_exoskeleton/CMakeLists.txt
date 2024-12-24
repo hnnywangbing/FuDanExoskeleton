@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(FdExoskeleton)
+project(fd_exoskeleton)
 
 add_compile_options(-std=c++14)
 
@@ -47,13 +47,15 @@ target_link_libraries(bridge_node
   ${catkin_LIBRARIES}
   ${ZMQ_LIBRARIES}
   ${libzmqpp}
+  ${Boost_LIBRARIES}
 )
 
+# 在target_link_libraries之后添加
+set_target_properties(bridge_node PROPERTIES INSTALL_RPATH "/usr/lib/x86_64-linux-gnu")
+
 catkin_package(
-  LIBRARIES FdExoskeleton
   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
   CATKIN_DEPENDS roscpp std_msgs geometry_msgs sensor_msgs message_runtime
-  DEPENDS system_libs
 )
 
 # 安装脚本
@@ -79,6 +81,7 @@ install(DIRECTORY config
 install(TARGETS bridge_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
 
 # catkin_install_python(PROGRAMS
 #   scripts/lada.py
