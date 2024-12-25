@@ -66,6 +66,7 @@ install(PROGRAMS
   scripts/joint_state_control.py
   scripts/joint_state_listener.py
   scripts/zeroMqServer.py
+  scripts/check_staircase.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
