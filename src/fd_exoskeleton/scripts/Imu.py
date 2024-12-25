@@ -156,8 +156,7 @@ def receive_data():
             roll_deg =abs(AHRS_DATA[3] * (180 / math.pi)) 
             pitch_deg =abs(AHRS_DATA[4] * (180 / math.pi)) 
 
-            print("Roll(rad) : ", roll_deg)
-            print("Pitch(rad) : " , pitch_deg)
+           
                # 判断是否摔倒
             if roll_deg > 30 :
                 current_datetime = datetime.now()
@@ -166,6 +165,8 @@ def receive_data():
                 msg.cmd = "fall-roll"
                 msg.value = roll_deg
                 publisher.publish(msg)
+                print("Roll(rad) : ", roll_deg)
+                print("Pitch(rad) : " , pitch_deg)
             elif pitch_deg > 30:
                 current_datetime = datetime.now()
                 msg = CmdMessage()
@@ -173,6 +174,8 @@ def receive_data():
                 msg.cmd = "fall-Pitch"
                 msg.value = pitch_deg
                 publisher.publish(msg)
+                print("Roll(rad) : ", roll_deg)
+                print("Pitch(rad) : " , pitch_deg)
             # Q1W=struct.unpack('f', data_s[24:28])[0]
             # Q2X=struct.unpack('f', data_s[28:32])[0]
             # Q3Y=struct.unpack('f', data_s[32:36])[0]
@@ -275,7 +278,7 @@ def UsePlatform():
 if __name__ == "__main__":
     # print(UsePlatform())
     opt = parse_opt()
-    publisher = rospy.Publisher('cmd', CmdMessage, queue_size=10)
+    publisher = rospy.Publisher('/cmd', CmdMessage, queue_size=10)
     rospy.init_node('imu_node', anonymous=True)
     opt = parse_opt()
     tr = threading.Thread(target=receive_data)

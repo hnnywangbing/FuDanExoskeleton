@@ -65,6 +65,7 @@ install(PROGRAMS
   scripts/Imutest.py
   scripts/joint_state_control.py
   scripts/joint_state_listener.py
+  scripts/zeroMqServer.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
