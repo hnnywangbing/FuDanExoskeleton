@@ -63,6 +63,8 @@ install(PROGRAMS
   scripts/talker.py
   scripts/Imu.py
   scripts/Imutest.py
+  scripts/joint_state_control.py
+  scripts/joint_state_listener.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
