@@ -62,11 +62,12 @@ install(PROGRAMS
   scripts/listener.py
   scripts/talker.py
   scripts/Imu.py
+  scripts/lida.py
+  scripts/app.py
+  scripts/realsense.py
   scripts/Imutest.py
   scripts/joint_state_control.py
   scripts/joint_state_listener.py
-  scripts/app.py
-  scripts/realsense.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

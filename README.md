@@ -1,6 +1,7 @@
 # FuDanExoskeleton
 
 # 编译
+catkin clean
 catkin config --install
 catkin build
 source install/setup.bash

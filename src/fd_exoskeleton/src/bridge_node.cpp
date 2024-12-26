@@ -88,9 +88,9 @@ void sub_cb(const T &msg)
   // send(&, true) for non-blocking, send(&, false) for blocking
   bool dont_block = false; // Actually for PUB mode zmq socket, send() will never block
   senders[i]->send(send_array, dont_block);
-  std::cout << "send!" << std::endl;
-  std::cout << msg << std::endl;
-  std::cout << i << std::endl;
+  // std::cout << "send!" << std::endl;
+  // std::cout << msg << std::endl;
+  // std::cout << i << std::endl;
 }
 
 

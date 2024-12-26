@@ -50,11 +50,11 @@ class DepthProcessingNode:
         average_step_height = np.mean(step_heights) if step_heights else 0
 
         current_datetime = datetime.now()
-                msg = CmdMessage()
-                msg.time = convert_rostime_to_int64(current_datetime)  
-                msg.cmd = "step_height"
-                msg.value = average_step_height
-                publisher.publish(msg)
+        msg = CmdMessage()
+        msg.time = convert_rostime_to_int64(current_datetime)  
+        msg.cmd = "step_height"
+        msg.value = average_step_height
+        publisher.publish(msg)
 
         rospy.loginfo(f'Average Step Height: {average_step_height * 1000:.2f} mm')
 

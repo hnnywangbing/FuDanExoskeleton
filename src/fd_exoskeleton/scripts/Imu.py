@@ -64,7 +64,7 @@ def parse_opt(known=False):
 
 
 # 接收数据线程
-def receive_data():
+def receive_data(publisher):
     open_port()
     # 尝试打开串口
     try:
@@ -277,11 +277,10 @@ def UsePlatform():
 
 if __name__ == "__main__":
     # print(UsePlatform())
-    opt = parse_opt()
     publisher = rospy.Publisher('/cmd', CmdMessage, queue_size=10)
     rospy.init_node('imu_node', anonymous=True)
     opt = parse_opt()
-    tr = threading.Thread(target=receive_data)
+    tr = threading.Thread(target=receive_data,args=(publisher,))
     tr.start()
     while True:
         try:
