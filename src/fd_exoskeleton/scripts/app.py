@@ -81,6 +81,8 @@ def main():
     # 主线程可以继续执行其他任务，或者简单地等待子线程结束
     request_thread.join()
     publish_thread.join()
+    # 使用 rospy.spin() 保持节点活跃，等待消息回调
+    rospy.spin()
 
 if __name__ == "__main__":
     main()
