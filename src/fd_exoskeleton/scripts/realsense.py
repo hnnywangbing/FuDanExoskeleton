@@ -4,12 +4,12 @@ import rospy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import numpy as np
-
+from fd_exoskeleton.msg import CmdMessage
 class DepthProcessingNode:
     def __init__(self):
         # 初始化ROS节点
-        rospy.init_node('depth_processing_node', anonymous=True)
-        
+        rospy.init_node('realsense_node', anonymous=True)
+        publisher = rospy.Publisher('/step_height', CmdMessage, queue_size=10)
         # 创建订阅者
         self.subscription = rospy.Subscriber(
             '/camera/depth/image_rect_raw',  # 请根据您的实际情况修改话题名称
@@ -48,6 +48,13 @@ class DepthProcessingNode:
 
         # 计算平均台阶高度
         average_step_height = np.mean(step_heights) if step_heights else 0
+
+        current_datetime = datetime.now()
+                msg = CmdMessage()
+                msg.time = convert_rostime_to_int64(current_datetime)  
+                msg.cmd = "step_height"
+                msg.value = average_step_height
+                publisher.publish(msg)
 
         rospy.loginfo(f'Average Step Height: {average_step_height * 1000:.2f} mm')
 

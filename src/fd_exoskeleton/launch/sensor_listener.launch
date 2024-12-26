@@ -1,0 +1,13 @@
+<!-- mylaunch.launch -->
+<launch>
+  <!-- 启动通讯中间件节点 -->
+  <node pkg="fd_exoskeleton" type="bridge_node" name="fd_exoskeleton" output="screen" >
+    <rosparam command="load" file="$(find fd_exoskeleton)/config/sensor_topics.yaml" />
+  </node>
+  <!-- 启动 imu  Python节点 -->
+  <node pkg="fd_exoskeleton" type="Imu.py" name="imu_node" output="screen"/>
+
+    <!-- 启动 lida Python节点 -->
+  <node pkg="fd_exoskeleton" type="lida.py" name="lida_node" output="screen"/>
+ 
+</launch>

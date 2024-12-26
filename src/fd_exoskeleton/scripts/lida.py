@@ -65,7 +65,7 @@ def send_distance_command(serial_port,publisher):
 def main():
 
     publisher = rospy.Publisher('cmd', CmdMessage, queue_size=10)
-    rospy.init_node('lada_node', anonymous=True)
+    rospy.init_node('lida_node', anonymous=True)
     rate = rospy.Rate(20)  # 50hz 
     # 设置串口参数，确保端口名正确
     serial_port = serial.Serial('/dev/ttyUSB0', baudrate=115200, timeout=1)

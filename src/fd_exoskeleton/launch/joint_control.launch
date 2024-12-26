@@ -1,0 +1,11 @@
+<!-- mylaunch.launch -->
+<launch>
+  <!-- 启动通讯中间件节点 -->
+  <node pkg="fd_exoskeleton" type="bridge_node" name="fd_exoskeleton" output="screen" >
+    <rosparam command="load" file="$(find fd_exoskeleton)/config/joint_topics.yaml" />
+  </node>
+  <!-- 启动 joint position 服务 Python节点 -->
+  <node pkg="fd_exoskeleton" type="joint_position.py" name="joint_position_node" output="screen"/>
+    <!-- 启动 joint position 服务 Python节点 -->
+  <node pkg="fd_exoskeleton" type="joint_effort.py" name="joint_effort_node" output="screen"/>
+</launch>

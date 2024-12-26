@@ -8,8 +8,7 @@
 ### list all <IPname: IP> here (IPname can be set arbitrarily) ###
 IP:
   self: '*'   # '*' stands for all self IPs
-  joint: 192.168.137.47
-  sensor: 192.168.137.112
+  main: 192.168.137.183
   test_local: 127.0.0.1 # just for local machine test
 
 ####### Send these ROS messages to remote robots #######
@@ -39,11 +38,11 @@ send_topics:
   srcIP: self # self IP
   srcPort: 3004 # ports of send_topics should be different
 
-- topic_name: /JointState # send the messages of this ROS topic
-  msg_type: sensor_msgs/JointState # ROS message type (rosmsg style)
-  max_freq: 10 # max sending frequency (Hz) int
-  srcIP: self # self IP
-  srcPort: 3005 # ports of send_topics should be different
+# - topic_name: /JointState # send the messages of this ROS topic
+#   msg_type: sensor_msgs/JointState # ROS message type (rosmsg style)
+#   max_freq: 10 # max sending frequency (Hz) int
+#   srcIP: self # self IP
+#   srcPort: 3005 # ports of send_topics should be different
 
 
 ####### receive these ROS messages from remote robots #######
@@ -51,29 +50,29 @@ send_topics:
 recv_topics:
 - topic_name: /imu_recv # the received messages will be published in this topic
   msg_type: sensor_msgs/Imu # ROS message type (rosmsg style)
-  srcIP: sensor # message source IPname
+  srcIP: main # message source IPname
   srcPort: 3001 # message source port
 
 - topic_name: /cmd_vel_recv # the received messages will be published in this topic
   msg_type: geometry_msgs/Twist # ROS message type (rosmsg style)
-  srcIP: sensor # message source IPname
+  srcIP: main # message source IPname
   srcPort: 3002 # message source port
 
 - topic_name: /string_recv # the received messages will be published in this topic
   msg_type: std_msgs/String # ROS message type (rosmsg style)
-  srcIP: sensor # message source IPname
+  srcIP: main # message source IPname
   srcPort: 3003 # message source port
 
 
 - topic_name: /cmd_recv # send the messages of this ROS topic
   msg_type: fd_exoskeleton/CmdMessage # ROS message type (rosmsg style)
   max_freq: 10 # max sending frequency (Hz) int
-  srcIP: sensor # self IP
+  srcIP: main # self IP
   srcPort: 3004 # ports of send_topics should be different
 
-- topic_name: /JointState_recv # send the messages of this ROS topic
-  msg_type: sensor_msgs/JointState # ROS message type (rosmsg style)
-  max_freq: 10 # max sending frequency (Hz) int
-  srcIP: joint # self IP
-  srcPort: 3005 # ports of send_topics should be different
+# - topic_name: /JointState_recv # send the messages of this ROS topic
+#   msg_type: sensor_msgs/JointState # ROS message type (rosmsg style)
+#   max_freq: 10 # max sending frequency (Hz) int
+#   srcIP: main # self IP
+#   srcPort: 3005 # ports of send_topics should be different
 
