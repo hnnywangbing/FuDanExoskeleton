@@ -9,6 +9,7 @@
 IP:
   self: '*'   # '*' stands for all self IPs
   main: 192.168.137.183
+  joint: 192.168.137.47
   test_local: 127.0.0.1 # just for local machine test
 
 ####### Send these ROS messages to remote robots #######
@@ -50,7 +51,7 @@ send_topics:
 recv_topics:
 - topic_name: /imu_recv # the received messages will be published in this topic
   msg_type: sensor_msgs/Imu # ROS message type (rosmsg style)
-  srcIP: main # message source IPname
+  srcIP: joint # message source IPname
   srcPort: 3001 # message source port
 
 - topic_name: /cmd_vel_recv # the received messages will be published in this topic

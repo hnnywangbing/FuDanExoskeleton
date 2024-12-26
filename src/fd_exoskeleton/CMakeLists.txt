@@ -65,7 +65,6 @@ install(PROGRAMS
   scripts/lida.py
   scripts/app.py
   scripts/realsense.py
-  scripts/Imutest.py
   scripts/joint_state_control.py
   scripts/joint_state_listener.py
   scripts/listener.py

@@ -28,8 +28,8 @@ scripts/lida.py
 rosrun fd_exoskeleton lida.py
 
 # realsense 楼梯检测 节点 
-scripts/check_staircase.py
-rosrun fd_exoskeleton check_staircase.py
+scripts/realsense.py
+rosrun fd_exoskeleton realsense.py
 
 # app控制服务 节点 发布控制指令与mpc 通信
 scripts/app.py
