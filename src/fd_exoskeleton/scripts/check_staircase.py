@@ -1,22 +1,32 @@
-import rclpy
-from rclpy.node import Node
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import rospy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import numpy as np
 
-class DepthProcessingNode(Node):
+class DepthProcessingNode:
     def __init__(self):
-        super().__init__('depth_processing_node')
-        self.subscription = self.create_subscription(
+        # 初始化ROS节点
+        rospy.init_node('depth_processing_node', anonymous=True)
+        
+        # 创建订阅者
+        self.subscription = rospy.Subscriber(
+            '/camera/depth/image_rect_raw',  # 请根据您的实际情况修改话题名称
             Image,
-            '/camera/camera/depth/image_rect_raw',  # 请根据您的实际情况修改话题名称
             self.depth_image_callback,
-            10)
+            queue_size=10)
+        
+        # 创建CvBridge对象，用于转换ROS图像消息到OpenCV图像
         self.bridge = CvBridge()
 
     def depth_image_callback(self, msg):
         # 使用cv_bridge将ROS图像消息转换为OpenCV图像
-        depth_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+        try:
+            depth_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='passthrough')
+        except CvBridgeError as e:
+            rospy.logerr(f"CV Bridge Error: {e}")
+            return
         
         # 获取图像的分辨率
         height, width = depth_image.shape
@@ -39,14 +49,16 @@ class DepthProcessingNode(Node):
         # 计算平均台阶高度
         average_step_height = np.mean(step_heights) if step_heights else 0
 
-        self.get_logger().info(f'Average Step Height: {average_step_height * 1000:.2f} mm')
+        rospy.loginfo(f'Average Step Height: {average_step_height * 1000:.2f} mm')
 
-def main(args=None):
-    rclpy.init(args=args)
-    depth_processing_node = DepthProcessingNode()
-    rclpy.spin(depth_processing_node)
-    depth_processing_node.destroy_node()
-    rclpy.shutdown()
+    def run(self):
+        # 保持节点持续运行
+        rospy.spin()
 
 if __name__ == '__main__':
-    main()
+    try:
+        # 创建节点对象并运行
+        node = DepthProcessingNode()
+        node.run()
+    except rospy.ROSInterruptException:
+        pass
