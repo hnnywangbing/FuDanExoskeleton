@@ -7,7 +7,7 @@ from fd_exoskeleton.msg import CmdMessage
 # Global variable to store CSV data
 csv_data = []
 pub = None  # Global publisher
-
+fallBool =False
 # Function to read CSV file and store its data in a list
 def read_csv_file():
     global csv_data
@@ -36,10 +36,16 @@ def publish_csv_data():
         rospy.loginfo(f"Published row {index}: {row}")
         
         # Sleep for 0.5 seconds before publishing the next row
-        rospy.sleep(0.5)
+        rospy.sleep(0.01)
 
 def callback(data):
-    rospy.loginfo(f'cmd: {data.cmd} value{data.value}')
+    global fallBool
+    rospy.loginfo(f'cmd: {data.cmd}  value:{data.value}  fallBool:{fallBool}')
+    if fallBool:
+        return
+    else :
+        fallBool =True
+    
     if "fall" in data.cmd:
         # Immediately publish all rows from CSV
         publish_csv_data()
@@ -53,7 +59,7 @@ def main():
     # Create the publisher once
     pub = rospy.Publisher('csv_output', Float64MultiArray, queue_size=10)
 
-    rospy.Subscriber('/cmd_recv', CmdMessage, callback)
+    rospy.Subscriber('/cmd_imu_recv', CmdMessage, callback)
 
     read_csv_file()
  

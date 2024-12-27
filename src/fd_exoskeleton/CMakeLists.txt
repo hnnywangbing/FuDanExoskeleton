@@ -65,6 +65,7 @@ install(PROGRAMS
   scripts/lida.py
   scripts/app.py
   scripts/realsense.py
+  scripts/joint_effort.py
   scripts/fall_down.py
   scripts/joint_state_control.py
   scripts/joint_state_listener.py
