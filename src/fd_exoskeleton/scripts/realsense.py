@@ -9,7 +9,7 @@ class DepthProcessingNode:
     def __init__(self):
         # 初始化ROS节点
         rospy.init_node('realsense_node', anonymous=True)
-        publisher = rospy.Publisher('/step_height', CmdMessage, queue_size=10)
+        publisher = rospy.Publisher('/cmd_step_height', CmdMessage, queue_size=10)
         # 创建订阅者
         self.subscription = rospy.Subscriber(
             '/camera/depth/image_rect_raw',  # 请根据您的实际情况修改话题名称
@@ -55,7 +55,6 @@ class DepthProcessingNode:
         msg.cmd = "step_height"
         msg.value = average_step_height
         publisher.publish(msg)
-
         rospy.loginfo(f'Average Step Height: {average_step_height * 1000:.2f} mm')
 
     def run(self):

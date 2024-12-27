@@ -140,7 +140,7 @@ def receive_data(publisher):
 #         exit(1)
 
 def main():
-    publisher = rospy.Publisher('/cmd', CmdMessage, queue_size=10)
+    publisher = rospy.Publisher('/cmd_imu', CmdMessage, queue_size=10)
     rospy.init_node('imu_node', anonymous=True)
     # open_port()  # 打开串口
     tr = threading.Thread(target=receive_data, args=(publisher,))

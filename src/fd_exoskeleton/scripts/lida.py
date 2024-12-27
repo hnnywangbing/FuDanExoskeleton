@@ -52,11 +52,11 @@ def send_distance_command(serial_port,publisher):
         # 计算这20个最小值的平均值
         average_value = np.mean(twenty_smallest_values)
         average_value = np.round(average_value, 2)
-        print("平均值:", average_value)
+        # print("平均值:", average_value)
         current_datetime = datetime.now()
         msg = CmdMessage()
         msg.time = convert_rostime_to_int64(current_datetime)  
-        msg.cmd = "lida"
+        msg.cmd = "/cmd_lida"
         msg.value = average_value
         publisher.publish(msg)
     else:
