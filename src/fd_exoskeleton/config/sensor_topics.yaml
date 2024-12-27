@@ -9,7 +9,7 @@
 IP:
   self: '*'   # '*' stands for all self IPs
   main: 192.168.137.183
-  joint: 192.168.137.47
+  joint: 192.168.137.115
   test_local: 127.0.0.1 # just for local machine test
 
 ####### Send these ROS messages to remote robots #######
@@ -68,12 +68,19 @@ recv_topics:
 - topic_name: /cmd_recv # send the messages of this ROS topic
   msg_type: fd_exoskeleton/CmdMessage # ROS message type (rosmsg style)
   max_freq: 10 # max sending frequency (Hz) int
-  srcIP: main # self IP
+  srcIP: main #   srcIP: joint  message source IPname
+  srcPort: 3004 # ports of send_topics should be different
+
+- topic_name: /cmd_recv # send the messages of this ROS topic
+  msg_type: fd_exoskeleton/CmdMessage # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: joint #   srcIP: joint  message source IPname
+
   srcPort: 3004 # ports of send_topics should be different
 
 # - topic_name: /JointState_recv # send the messages of this ROS topic
 #   msg_type: sensor_msgs/JointState # ROS message type (rosmsg style)
 #   max_freq: 10 # max sending frequency (Hz) int
-#   srcIP: main # self IP
+#   srcIP: main #   srcIP: joint  message source IPname
 #   srcPort: 3005 # ports of send_topics should be different
 

@@ -9,7 +9,7 @@
 IP:
   self: '*'   # '*' stands for all self IPs
   main: 192.168.137.183
-  sensor: 192.168.137.47
+  sensor: 192.168.137.112
   test_local: 127.0.0.1 # just for local machine test
 
 ####### Send these ROS messages to remote robots #######
