@@ -136,8 +136,8 @@ void recv_func(int i)
       memcpy(recv_buffer.get(), static_cast<const uint8_t *>(recv_array.raw_data(recv_array.read_cursor())), data_len);
       deserialize_publish(recv_buffer.get(), data_len, recvTopics[i].type, i);
 
-      std::cout << data_len << std::endl;
-      std::cout << recv_buffer.get() << std::endl;
+      // std::cout << data_len << std::endl;
+      // std::cout << recv_buffer.get() << std::endl;
     }
 
     /* if receive() does not block, sleep to decrease loop rate */
@@ -151,7 +151,8 @@ void recv_func(int i)
         if (topicName.at(0) != '/') {
           if (ns == "/") {topicName = "/" + topicName;}
           else {topicName = ns + "/" + topicName;}
-        }  // print namespace prefix if topic name is not global
+        }  
+        // print namespace prefix if topic name is not global
         ROS_INFO("[bridge node] \"%s\" received!", topicName.c_str());
       } // false -> true(first message in)        
       recv_flags_last[i] = recv_flag;

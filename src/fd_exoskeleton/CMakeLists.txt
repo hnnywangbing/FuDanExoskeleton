@@ -65,9 +65,11 @@ install(PROGRAMS
   scripts/lida.py
   scripts/app.py
   scripts/realsense.py
+  scripts/fall_down.py
   scripts/joint_state_control.py
   scripts/joint_state_listener.py
   scripts/listener.py
+  scripts/csv/motor.csv
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

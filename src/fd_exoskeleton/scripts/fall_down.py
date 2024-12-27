@@ -12,7 +12,7 @@ pub = None  # Global publisher
 def read_csv_file():
     global csv_data
     try:
-        with open('csv/motor.csv', mode='r') as file:
+        with open('/home/wangbo/FuDanExoskeleton/install/lib/fd_exoskeleton/motor.csv', mode='r') as file:
             reader = csv.reader(file)
             header = next(reader)  # Skip header line (if any)
             for row in reader:
@@ -53,7 +53,7 @@ def main():
     # Create the publisher once
     pub = rospy.Publisher('csv_output', Float64MultiArray, queue_size=10)
 
-    rospy.Subscriber('cmd', CmdMessage, callback)
+    rospy.Subscriber('/cmd_recv', CmdMessage, callback)
 
     read_csv_file()
  

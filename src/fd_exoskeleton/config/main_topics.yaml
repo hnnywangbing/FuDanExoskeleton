@@ -33,11 +33,17 @@ send_topics:
   srcIP: self # self IP
   srcPort: 3003 # ports of send_topics should be different
 
-- topic_name: /cmd # send the messages of this ROS topic
+- topic_name: /cmd_lida # send the messages of this ROS topic
   msg_type: fd_exoskeleton/CmdMessage # ROS message type (rosmsg style)
   max_freq: 10 # max sending frequency (Hz) int
   srcIP: self # self IP
   srcPort: 3004 # ports of send_topics should be different
+
+- topic_name: /cmd_imu # send the messages of this ROS topic
+  msg_type: fd_exoskeleton/CmdMessage # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: self # self IP
+  srcPort: 3005 # ports of send_topics should be different
 
 - topic_name: /JointState # send the messages of this ROS topic
   msg_type: sensor_msgs/JointState # ROS message type (rosmsg style)
@@ -65,15 +71,21 @@ recv_topics:
   srcPort: 3003 # message source port
 
 
-- topic_name: /cmd_recv # send the messages of this ROS topic
+- topic_name: /cmd_lida_recv # send the messages of this ROS topic
   msg_type: fd_exoskeleton/CmdMessage # ROS message type (rosmsg style)
   max_freq: 10 # max sending frequency (Hz) int
   srcIP: sensor # self IP
   srcPort: 3004 # ports of send_topics should be different
 
+- topic_name: /cmd_imu_recv # send the messages of this ROS topic
+  msg_type: fd_exoskeleton/CmdMessage # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: sensor # self IP
+  srcPort: 3005 # ports of send_topics should be different
+
 - topic_name: /JointState_recv # send the messages of this ROS topic
   msg_type: sensor_msgs/JointState # ROS message type (rosmsg style)
   max_freq: 10 # max sending frequency (Hz) int
   srcIP: joint # self IP
-  srcPort: 3005 # ports of send_topics should be different
+  srcPort: 3006 # ports of send_topics should be different
 
