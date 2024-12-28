@@ -5,7 +5,7 @@
     <rosparam command="load" file="$(find fd_exoskeleton)/config/joint_topics.yaml" />
   </node>
   <!-- 启动 joint position 服务 跌倒 Python节点 -->
-  <node pkg="fd_exoskeleton" type="fall_down.py" name="joint_position_node" output="screen"/>
+  <!-- <node pkg="fd_exoskeleton" type="fall_dowcn.py" name="joint_position_node" output="screen"/> -->
   <!-- 启动 joint effort 服务 Python节点 -->
   <node pkg="fd_exoskeleton" type="joint_effort.py" name="joint_effort_node" output="screen"/>
 </launch>
