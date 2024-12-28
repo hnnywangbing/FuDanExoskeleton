@@ -184,7 +184,8 @@ Some applications:
 
 
 
-
+#安装库文件 libzmqpp-dev
+sudo apt-get install libzmqpp-dev
 
 
 #配置传感器端口：查看端口ls /dev/ttyUSB*

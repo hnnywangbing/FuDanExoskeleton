@@ -9,6 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   sensor_msgs
   message_generation
+  genmsg
+  unitree_legged_msgs
 )
 
 # 包含 libzmqpp 的头文件目录
@@ -54,7 +56,7 @@ set_target_properties(bridge_node PROPERTIES INSTALL_RPATH "/usr/lib/x86_64-linu
 
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS roscpp std_msgs geometry_msgs sensor_msgs message_runtime
+  CATKIN_DEPENDS roscpp std_msgs geometry_msgs sensor_msgs message_runtime unitree_legged_msgs
 )
 
 # 安装脚本

@@ -26,4 +26,7 @@
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>python</exec_depend>
   <exec_depend>rospy</exec_depend>
+
+  <depend>unitree_legged_msgs</depend>
+  <depend>genmsg</depend>
 </package>

@@ -8,7 +8,7 @@
 ### list all <IPname: IP> here (IPname can be set arbitrarily) ###
 IP:
   self: '*'   # '*' stands for all self IPs
-  joint: 192.168.137.115
+  joint: 192.168.137.10
   sensor: 192.168.137.112
   test_local: 127.0.0.1 # just for local machine test
 
@@ -49,7 +49,56 @@ send_topics:
   msg_type: sensor_msgs/JointState # ROS message type (rosmsg style)
   max_freq: 10 # max sending frequency (Hz) int
   srcIP: self # self IP
-  srcPort: 3005 # ports of send_topics should be different
+  srcPort: 3006 # ports of send_topics should be different
+
+- topic_name: /exo_humanoid_gazebo/L_hip_controller/state # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: self #  message source IPname
+  srcPort: 3007 # ports of send_topics should be different
+
+- topic_name: /exo_humanoid_gazebo/L_hip2_controller/state # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: self #  message source IPname
+  srcPort: 3008 # ports of send_topics should be different
+
+- topic_name: /exo_humanoid_gazebo/L_calf_controller/state # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: self #  message source IPname
+  srcPort: 3010 # ports of send_topics should be different
+
+- topic_name: /exo_humanoid_gazebo/L_toe_controller/state # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: self #  message source IPname
+  srcPort: 3011 # ports of send_topics should be different
+
+ 
+- topic_name: /exo_humanoid_gazebo/R_hip_controller/state # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: self #  message source IPname
+  srcPort: 3012 # ports of send_topics should be different
+
+- topic_name: /exo_humanoid_gazebo/R_hip2_controller/state # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: self #  message source IPname
+  srcPort: 3013 # ports of send_topics should be different
+
+- topic_name: /exo_humanoid_gazebo/R_calf_controller/state # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: self #  message source IPname
+  srcPort: 3014 # ports of send_topics should be different
+
+- topic_name: /exo_humanoid_gazebo/R_toe_controller/state # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: self #  message source IPname
+  srcPort: 3015 # ports of send_topics should be different
 
 
 ####### receive these ROS messages from remote robots #######
@@ -89,3 +138,51 @@ recv_topics:
   srcIP: joint # self IP
   srcPort: 3006 # ports of send_topics should be different
 
+- topic_name: /exo_humanoid_gazebo/L_hip_controller/command # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: joint #  message source IPname
+  srcPort: 3007 # ports of send_topics should be different
+
+- topic_name: /exo_humanoid_gazebo/L_hip2_controller/command # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: joint #  message source IPname
+  srcPort: 3008 # ports of send_topics should be different
+
+- topic_name: /exo_humanoid_gazebo/L_calf_controller/command # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: joint #  message source IPname
+  srcPort: 3010 # ports of send_topics should be different
+
+- topic_name: /exo_humanoid_gazebo/L_toe_controller/command # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: joint #  message source IPname
+  srcPort: 3011 # ports of send_topics should be different
+
+
+- topic_name: /exo_humanoid_gazebo/R_hip_controller/command # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: joint #  message source IPname
+  srcPort: 3012 # ports of send_topics should be different
+
+- topic_name: /exo_humanoid_gazebo/R_hip2_controller/command # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: joint #  message source IPname
+  srcPort: 3013 # ports of send_topics should be different
+
+- topic_name: /exo_humanoid_gazebo/R_calf_controller/command # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: joint #  message source IPname
+  srcPort: 3014 # ports of send_topics should be different
+
+- topic_name: /exo_humanoid_gazebo/R_toe_controller/command # send the messages of this ROS topic
+  msg_type: unitree_legged_msgs/MotorCmd # ROS message type (rosmsg style)
+  max_freq: 10 # max sending frequency (Hz) int
+  srcIP: joint #  message source IPname
+  srcPort: 3015 # ports of send_topics should be different
