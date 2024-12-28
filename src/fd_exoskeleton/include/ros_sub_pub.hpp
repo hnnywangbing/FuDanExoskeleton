@@ -43,7 +43,14 @@
 #define MSG_TYPE5 "sensor_msgs/JointState"
 #define MSG_CLASS5 sensor_msgs::JointState
 
+#include <unitree_legged_msgs/MotorCmd.h>
+#define MSG_TYPE6 "unitree_legged_msgs/MotorCmd"
+#define MSG_CLASS6 unitree_legged_msgs::MotorCmd
 
+
+#include <unitree_legged_msgs/MotorState.h>
+#define MSG_TYPE7 "unitree_legged_msgs/MotorState"
+#define MSG_CLASS7 unitree_legged_msgs::MotorCmd
 // #include <xxx/yy.h>
 // #define MSG_TYPE4 "xxx/yy"
 // #define MSG_CLASS4 xxx::yy
