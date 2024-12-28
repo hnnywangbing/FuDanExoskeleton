@@ -44,13 +44,78 @@
 #define MSG_CLASS5 sensor_msgs::JointState
 
 #include <unitree_legged_msgs/MotorCmd.h>
-#define MSG_TYPE6 "unitree_legged_msgs/MotorCmd"
+#define MSG_TYPE6 "/exo_humanoid_gazebo/L_hip_controller/command"
 #define MSG_CLASS6 unitree_legged_msgs::MotorCmd
+
+#include <unitree_legged_msgs/MotorCmd.h>
+#define MSG_TYPE7 "/exo_humanoid_gazebo/L_hip2_controller/command"
+#define MSG_CLASS7 unitree_legged_msgs::MotorCmd
+
+#include <unitree_legged_msgs/MotorCmd.h>
+#define MSG_TYPE8 "/exo_humanoid_gazebo/L_calf_controller/command"
+#define MSG_CLASS8 unitree_legged_msgs::MotorCmd
+
+#include <unitree_legged_msgs/MotorCmd.h>
+#define MSG_TYPE9 "/exo_humanoid_gazebo/L_toe_controller/command"
+#define MSG_CLASS9 unitree_legged_msgs::MotorCmd
+
+#include <unitree_legged_msgs/MotorCmd.h>
+#define MSG_TYPE10 "/exo_humanoid_gazebo/R_hip_controller/command"
+#define MSG_CLASS10 unitree_legged_msgs::MotorCmd
+
+#include <unitree_legged_msgs/MotorCmd.h>
+#define MSG_TYPE11 "/exo_humanoid_gazebo/R_hip2_controller/command"
+#define MSG_CLASS11 unitree_legged_msgs::MotorCmd
+
+#include <unitree_legged_msgs/MotorCmd.h>
+#define MSG_TYPE12 "/exo_humanoid_gazebo/R_calf_controller/command"
+#define MSG_CLASS12 unitree_legged_msgs::MotorCmd
+
+#include <unitree_legged_msgs/MotorCmd.h>
+#define MSG_TYPE13 "/exo_humanoid_gazebo/R_toe_controller/command"
+#define MSG_CLASS13 unitree_legged_msgs::MotorCmd
+
+
+
+
+#include <unitree_legged_msgs/MotorCmd.h>
+#define MSG_TYPE14 "/exo_humanoid_gazebo/L_hip_controller/MotorState"
+#define MSG_CLASS14 unitree_legged_msgs::MotorState
 
 
 #include <unitree_legged_msgs/MotorState.h>
-#define MSG_TYPE7 "unitree_legged_msgs/MotorState"
-#define MSG_CLASS7 unitree_legged_msgs::MotorState
+#define MSG_TYPE15 "/exo_humanoid_gazebo/L_hip2_controller/MotorState"
+#define MSG_CLASS15 unitree_legged_msgs::MotorState
+
+
+#include <unitree_legged_msgs/MotorState.h>
+#define MSG_TYPE116 "/exo_humanoid_gazebo/L_calf_controller/MotorState"
+#define MSG_CLASS16 unitree_legged_msgs::MotorState
+
+
+#include <unitree_legged_msgs/MotorState.h>
+#define MSG_TYPE17 "/exo_humanoid_gazebo/L_toe_controller/MotorState"
+#define MSG_CLASS17 unitree_legged_msgs::MotorState
+
+
+
+#include <unitree_legged_msgs/MotorState.h>
+#define MSG_TYPE18 "/exo_humanoid_gazebo/R_hip_controller/MotorState"
+#define MSG_CLASS18 unitree_legged_msgs::MotorState
+
+
+#include <unitree_legged_msgs/MotorState.h>
+#define MSG_TYPE19 "/exo_humanoid_gazebo/R_hip2_controller/MotorState"
+#define MSG_CLASS19 unitree_legged_msgs::MotorState
+
+
+#include <unitree_legged_msgs/MotorState.h>
+#define MSG_TYPE20 "/exo_humanoid_gazebo/R_calf_controller/MotorState"
+#define MSG_CLASS20 unitree_legged_msgs::MotorState
+
+#include <unitree_legged_msgs/MotorState.h>
+#define MSG_TYPE21 "/exo_humanoid_gazebo/R_toe_controller/MotorState"
+#define MSG_CLASS21 unitree_legged_msgs::MotorState
 // #include <xxx/yy.h>
 // #define MSG_TYPE4 "xxx/yy"
 // #define MSG_CLASS4 xxx::yy
