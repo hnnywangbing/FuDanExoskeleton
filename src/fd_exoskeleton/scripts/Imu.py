@@ -202,7 +202,7 @@ def main():
    
     rospy.init_node('imu_node', anonymous=True)
     publisher = rospy.Publisher('/cmd_imu', CmdMessage, queue_size=10)
-    imu_states_publisher = rospy.Publisher('/gazebo/imu_state', Imu, queue_size=10)
+    imu_states_publisher = rospy.Publisher('/imu_state', Imu, queue_size=10)
     # open_port()  # 打开串口
     tr = threading.Thread(target=receive_data, args=(publisher,imu_states_publisher,))
     tr.daemon = True  # 将线程设为守护线程

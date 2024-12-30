@@ -15,11 +15,11 @@ IP:
 ####### Send these ROS messages to remote robots #######
 ## if no send_topics needed, comment all these out
 send_topics:
-- topic_name: /gazebo/imu_state # send the messages of this ROS topic
+- topic_name: /imu_state # send the messages of this ROS topic
   msg_type: sensor_msgs/Imu # ROS message type (rosmsg style)
   max_freq: 1000 # max sending frequency (Hz) int
   srcIP: self # self IP
-  srcPort: 4001 # ports of send_topics should be different
+  srcPort: 3001 # ports of send_topics should be different
 
 - topic_name: /cmd_vel # send the messages of this ROS topic
   msg_type: geometry_msgs/Twist # ROS message type (rosmsg style)

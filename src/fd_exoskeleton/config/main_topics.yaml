@@ -8,18 +8,18 @@
 ### list all <IPname: IP> here (IPname can be set arbitrarily) ###
 IP:
   self: '*'   # '*' stands for all self IPs
-  joint: 192.168.137.10
+  joint: 192.168.137.123
   sensor: 192.168.137.112
   test_local: 127.0.0.1 # just for local machine test
 
 ####### Send these ROS messages to remote robots #######
 ## if no send_topics needed, comment all these out
 send_topics:
-- topic_name: /imu_state # send the messages of this ROS topic
-  msg_type: sensor_msgs/Imu # ROS message type (rosmsg style)
-  max_freq: 1000 # max sending frequency (Hz) int
-  srcIP: self # self IP
-  srcPort: 3001 # ports of send_topics should be different
+# - topic_name: /imu_state # send the messages of this ROS topic
+#   msg_type: sensor_msgs/Imu # ROS message type (rosmsg style)
+#   max_freq: 1000 # max sending frequency (Hz) int
+#   srcIP: self # self IP
+#   srcPort: 3001 # ports of send_topics should be different
 
 - topic_name: /cmd_vel # send the messages of this ROS topic
   msg_type: geometry_msgs/Twist # ROS message type (rosmsg style)
@@ -104,7 +104,7 @@ send_topics:
 ####### receive these ROS messages from remote robots #######
 ## if no recv_topics needed, comment all these out
 recv_topics:
-- topic_name: /gazebo/imu_state # the received messages will be published in this topic
+- topic_name: /imu_state # the received messages will be published in this topic
   msg_type: sensor_msgs/Imu # ROS message type (rosmsg style)
   srcIP: sensor # message source IPname
   srcPort: 3001 # message source port
