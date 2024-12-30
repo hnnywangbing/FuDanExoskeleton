@@ -104,7 +104,7 @@ send_topics:
 ####### receive these ROS messages from remote robots #######
 ## if no recv_topics needed, comment all these out
 recv_topics:
-- topic_name: /gazebo/imu_states # the received messages will be published in this topic
+- topic_name: /gazebo/imu_state # the received messages will be published in this topic
   msg_type: sensor_msgs/Imu # ROS message type (rosmsg style)
   srcIP: sensor # message source IPname
   srcPort: 3001 # message source port

@@ -8,6 +8,6 @@
   <node pkg="fd_exoskeleton" type="Imu.py" name="imu_node" output="screen"/>
 
     <!-- 启动 lida Python节点 -->
-  <!-- <node pkg="fd_exoskeleton" type="lida.py" name="lida_node" output="screen"/> -->
+  <node pkg="fd_exoskeleton" type="lida.py" name="lida_node" output="screen"/>
  
 </launch>

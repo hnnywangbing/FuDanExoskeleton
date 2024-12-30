@@ -12,7 +12,7 @@ from serial import EIGHTBITS, PARITY_NONE, STOPBITS_ONE
 from datetime import datetime
 from sensor_msgs.msg import Imu
 # 固定的串口参数
-PORT = '/dev/ttyUSB0'  # 串口端口
+PORT = '/dev/ttyUSB1'  # 串口端口
 BAUDRATE = 921600      # 波特率
 TIMEOUT = 20           # 超时时间
 
@@ -152,6 +152,7 @@ def receive_data(publisher,imu_states_publisher):
             msgImuStatus.linear_acceleration.z = linear_acceleration_z
 
             imu_states_publisher.publish(msgImuStatus)
+            # print("imu_states_publisher")
 
         # 读取并解析AHRS数据
         elif head_type == TYPE_AHRS:

@@ -68,7 +68,7 @@ def main():
     rospy.init_node('lida_node', anonymous=True)
     rate = rospy.Rate(20)  # 50hz 
     # 设置串口参数，确保端口名正确
-    serial_port = serial.Serial('/dev/ttyUSB1', baudrate=115200, timeout=1)
+    serial_port = serial.Serial('/dev/ttyUSB0', baudrate=115200, timeout=1)
     # 上电
     power_on_command = bytes.fromhex("F5 40 01 00 00 00 00 00 00 00 9C D7 D6 91")
     serial_port.write(power_on_command)
