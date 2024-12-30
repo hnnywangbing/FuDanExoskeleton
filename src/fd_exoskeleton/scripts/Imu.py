@@ -10,9 +10,9 @@ from fd_exoskeleton.msg import CmdMessage
 import traceback
 from serial import EIGHTBITS, PARITY_NONE, STOPBITS_ONE
 from datetime import datetime
-
+from sensor_msgs.msg import Imu
 # 固定的串口参数
-PORT = '/dev/ttyUSB0'  # 串口端口
+PORT = '/dev/ttyUSB1'  # 串口端口
 BAUDRATE = 921600      # 波特率
 TIMEOUT = 20           # 超时时间
 
@@ -46,7 +46,7 @@ def convert_rostime_to_int64(dt):
     return total_nanoseconds
 
 # 接收数据线程
-def receive_data(publisher):
+def receive_data(publisher,imu_states_publisher):
     try:
         serial_ = serial.Serial(port=PORT, baudrate=BAUDRATE, bytesize=EIGHTBITS, parity=PARITY_NONE,
                                 stopbits=STOPBITS_ONE, timeout=TIMEOUT)
@@ -94,14 +94,73 @@ def receive_data(publisher):
             data_s = serial_.read(int(IMU_LEN, 16))
             IMU_DATA = struct.unpack('12f ii', data_s[0:56])
             # 解析IMU数据（此处省略打印语句）
+            #print(IMU_DATA)
+            # print("Gyroscope_X(rad/s): " + str(IMU_DATA[0]))
+            # print("Gyroscope_Y(rad/s) : " + str(IMU_DATA[1]))
+            # print("Gyroscope_Z(rad/s) : " + str(IMU_DATA[2]))
+            # print("Accelerometer_X(m/s^2) : " + str(IMU_DATA[3]))
+            # print("Accelerometer_Y(m/s^2) : " + str(IMU_DATA[4]))
+            # print("Accelerometer_Z(m/s^2) : " + str(IMU_DATA[5]))
+            # print("Magnetometer_X(mG) : " + str(IMU_DATA[6]))
+            # print("Magnetometer_Y(mG) : " + str(IMU_DATA[7]))
+            # print("Magnetometer_Z(mG) : " + str(IMU_DATA[8]))
+            # print("IMU_Temperature : " + str(IMU_DATA[9]))
+            # print("Pressure : " + str(IMU_DATA[10]))
+            # print("Pressure_Temperature : " + str(IMU_DATA[11]))
+            # print("Timestamp(us) : " + str(IMU_DATA[12]))
+            # 从数据流中提取四元数组件
+            Q1W = struct.unpack('f', data_s[24:28])[0]
+            Q2X = struct.unpack('f', data_s[28:32])[0]
+            Q3Y = struct.unpack('f', data_s[32:36])[0]
+            Q4Z = struct.unpack('f', data_s[36:40])[0]
+
+            # 创建一个Imu消息实例
+            msgImuStatus = Imu()
+
+            # 设置四元数
+            msgImuStatus.orientation.w = Q1W
+            msgImuStatus.orientation.x = Q2X
+            msgImuStatus.orientation.y = Q3Y
+            msgImuStatus.orientation.z = Q4Z
+
+            # 假设data_s中还包含角速度和线性加速度数据，以下为示例代码
+            # 从数据流中提取角速度组件
+            # print("Gyroscope_X(rad/s): " + str(IMU_DATA[0]))
+            # print("Gyroscope_Y(rad/s) : " + str(IMU_DATA[1]))
+            # print("Gyroscope_Z(rad/s) : " + str(IMU_DATA[2]))
+            # print("Accelerometer_X(m/s^2) : " + str(IMU_DATA[3]))
+            # print("Accelerometer_Y(m/s^2) : " + str(IMU_DATA[4]))
+            # print("Accelerometer_Z(m/s^2) : " + str(IMU_DATA[5]))
+
+            angular_velocity_x =  IMU_DATA[0]
+            angular_velocity_y =  IMU_DATA[1]
+            angular_velocity_z =  IMU_DATA[2]
+
+            # 设置角速度
+            msgImuStatus.angular_velocity.x = angular_velocity_x
+            msgImuStatus.angular_velocity.y = angular_velocity_y
+            msgImuStatus.angular_velocity.z = angular_velocity_z
+
+            # 从数据流中提取线性加速度组件
+            linear_acceleration_x = IMU_DATA[3]
+            linear_acceleration_y = IMU_DATA[3]
+            linear_acceleration_z = IMU_DATA[4]
+
+            # 设置线性加速度
+            msgImuStatus.linear_acceleration.x = linear_acceleration_x
+            msgImuStatus.linear_acceleration.y = linear_acceleration_y
+            msgImuStatus.linear_acceleration.z = linear_acceleration_z
+
+            imu_states_publisher.publish(msgImuStatus)
+            print("imu_states_publisher")
 
         # 读取并解析AHRS数据
         elif head_type == TYPE_AHRS:
             data_s = serial_.read(int(AHRS_LEN, 16))
             AHRS_DATA = struct.unpack('10f ii', data_s[0:48])
+          
             roll_deg = abs(AHRS_DATA[3] * (180 / math.pi))
             pitch_deg = abs(AHRS_DATA[4] * (180 / math.pi))
-
             # 判断是否摔倒
             if roll_deg > 30:
                 current_datetime = datetime.now()
@@ -140,10 +199,12 @@ def receive_data(publisher):
 #         exit(1)
 
 def main():
-    publisher = rospy.Publisher('/cmd_imu', CmdMessage, queue_size=10)
+   
     rospy.init_node('imu_node', anonymous=True)
+    publisher = rospy.Publisher('/cmd_imu', CmdMessage, queue_size=10)
+    imu_states_publisher = rospy.Publisher('/imu_state', Imu, queue_size=10)
     # open_port()  # 打开串口
-    tr = threading.Thread(target=receive_data, args=(publisher,))
+    tr = threading.Thread(target=receive_data, args=(publisher,imu_states_publisher,))
     tr.daemon = True  # 将线程设为守护线程
     tr.start()
 
