@@ -67,7 +67,6 @@ def send_initial_can_messages(bus):
                 # 访问消息的各个属性
                 arbitration_id=hex(message.arbitration_id)
                 hex_str = binascii.hexlify(message.data).decode('utf-8')
-                print(f"message: {hex_str}")
             time.sleep(0.3)
         
     except can.CanError:
@@ -87,7 +86,7 @@ def send_state_can_messages(id,bus):
                 print(f"Message received: {message}")
                 signed_value=get_position_value(message.data)
                 print(f"signed_position_value: {signed_value}")
-                return signed_value
+                return round(signed_value/10000,2)
     except can.CanError:
         print("Failed to send initialization CAN messages")  
 
@@ -126,209 +125,351 @@ def get_velocity_value(data):
 
 
 
-def listener(bus):
-   
+def listener(bus,bus1):
+    print("启动了")
     # 订阅 'csv_output' 话题，消息类型为 Float64MultiArray
-    #rospy.Subscriber('/exo_humanoid_gazebo/R_calf_controller/command', MotorCmd, callback, callback_args=(bus,))
-    # rospy.Subscriber('/exo_humanoid_gazebo/R_hip2_controller/command', MotorCmd, callback, callback_args=(bus,3,))
-    # rospy.Subscriber('/exo_humanoid_gazebo/R_hip_controller/command', MotorCmd, callback, callback_args=(bus,4,))
-    rospy.Subscriber('/exo_humanoid_gazebo/R_toe_controller/command', MotorCmd, callback,callback_args=bus)
-    # rospy.Subscriber('/exo_humanoid_gazebo/L_calf_controller/command', MotorCmd, callback, callback_args=(bus1,2))
-    # rospy.Subscriber('/exo_humanoid_gazebo/L_hip2_controller/command', MotorCmd, callback, callback_args=(bus1,3))
-    # rospy.Subscriber('/exo_humanoid_gazebo/L_hip_controller/command', MotorCmd, callback, callback_args=(bus1,4))
-    # rospy.Subscriber('/exo_humanoid_gazebo/L_toe_controller/command', MotorCmd, callback, callback_args=(bus1,1))
-    # 保持节点运行
-    rospy.spin()
+    rospy.Subscriber('/exo_humanoid_gazebo/R_calf_controller/command', MotorCmd, callbackR2, callback_args=bus)
+    rospy.Subscriber('/exo_humanoid_gazebo/R_hip2_controller/command', MotorCmd, callbackR3, callback_args=bus)
+    rospy.Subscriber('/exo_humanoid_gazebo/R_hip_controller/command', MotorCmd, callbackR4, callback_args=bus)
+    rospy.Subscriber('/exo_humanoid_gazebo/R_toe_controller/command', MotorCmd, callbackR1,callback_args=bus)
+    rospy.Subscriber('/exo_humanoid_gazebo/L_calf_controller/command', MotorCmd, callbackL2, callback_args=bus1)
+    rospy.Subscriber('/exo_humanoid_gazebo/L_hip2_controller/command', MotorCmd, callbackL3, callback_args=bus1)
+    rospy.Subscriber('/exo_humanoid_gazebo/L_hip_controller/command', MotorCmd, callbackL4, callback_args=bus1)
+    rospy.Subscriber('/exo_humanoid_gazebo/L_toe_controller/command', MotorCmd, callbackL1, callback_args=bus1)
+
+#
+def talker(bus,bus1):
+    motor_state = MotorState()
+    R_calf_controller = rospy.Publisher('/exo_humanoid_gazebo/R_calf_controller/state', MotorState, queue_size=10)
+    R_hip_controller = rospy.Publisher('/exo_humanoid_gazebo/R_hip_controller/state', MotorState, queue_size=10)
+    R_hip2_controller = rospy.Publisher('/exo_humanoid_gazebo/R_hip2_controller/state', MotorState, queue_size=10)
+    R_toe_controller = rospy.Publisher('/exo_humanoid_gazebo/R_toe_controller/state', MotorState, queue_size=10)
+    L_calf_controller = rospy.Publisher('/exo_humanoid_gazebo/L_calf_controller/state', MotorState, queue_size=10)
+    L_hip_controller = rospy.Publisher('/exo_humanoid_gazebo/L_hip_controller/state', MotorState, queue_size=10)
+    L_hip2_controller = rospy.Publisher('/exo_humanoid_gazebo/L_hip2_controller/state', MotorState, queue_size=10)
+    L_toe_controller = rospy.Publisher('/exo_humanoid_gazebo/L_toe_controller/state', MotorState, queue_size=10)
+    ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+    request_data = bytes.fromhex('01 03 00 00 00 10 44 06')
+    try:
+        while True:
+            ser.write(request_data)
+            response = ser.read(37)
+            if len(response) == 37:
+                received_crc = response[-2:]
+                calculated_crc = calculate_crc(response[:-2]).to_bytes(2, byteorder='little')
+                if received_crc == calculated_crc:
+                    channels = parse_data(response)
+                    for i, channel in enumerate(channels):
+                        print(f"通道{i + 1}：{channel}")
+                        if i+1==1:
+                            position_value=send_state_can_messages(3,bus1)
+                            speed_value=send_speed_can_messages(3,bus1)
+                            effort[1]=channel
+                            motor_state.q=position_value
+                            motor_state.dq=speed_value
+                            motor_state.tauEst=channel
+                            # 发布消息
+                            L_hip2_controller.publish(motor_state)
+                        elif i+1==2:
+                            position_value=send_state_can_messages(2,bus)
+                            speed_value=send_speed_can_messages(2,bus)
+                            effort[6]=channel
+                            motor_state.q=position_value
+                            motor_state.dq=speed_value
+                            motor_state.tauEst=channel
+                            # 发布消息
+                            R_calf_controller.publish(motor_state)
+                        elif i+1==3:
+                            position_value=send_state_can_messages(4,bus)
+                            speed_value=send_speed_can_messages(4,bus)
+                            effort[4]=channel
+                            motor_state.q=position_value
+                            motor_state.dq=speed_value
+                            motor_state.tauEst=channel
+                            # 发布消息
+                            R_hip_controller.publish(motor_state)
+                        elif i+1==4:
+                            position_value=send_state_can_messages(4,bus1)
+                            speed_value=send_speed_can_messages(4,bus1)
+                            effort[0]=channel
+                            motor_state.q=position_value
+                            motor_state.dq=speed_value
+                            motor_state.tauEst=channel
+                            # 发布消息
+                            L_hip_controller.publish(motor_state)
+                        elif i+1==5:
+                            position_value=send_state_can_messages(3,bus)
+                            speed_value=send_speed_can_messages(3,bus)
+                            effort[5]=channel
+                            motor_state.q=position_value
+                            motor_state.dq=speed_value
+                            motor_state.tauEst=channel
+                            # 发布消息
+                            R_hip2_controller.publish(motor_state)
+                        elif i+1==6:
+                            position_value=send_state_can_messages(2,bus1)
+                            speed_value=send_speed_can_messages(2,bus1)
+                            effort[2]=channel
+                            motor_state.q=position_value
+                            motor_state.dq=speed_value
+                            motor_state.tauEst=channel
+                            # 发布消息
+                            L_calf_controller.publish(motor_state)
+                        elif i+1==7:
+                            position_value=send_state_can_messages(1,bus1)
+                            speed_value=send_speed_can_messages(1,bus1)
+                            effort[3]=channel
+                            motor_state.q=position_value
+                            motor_state.dq=speed_value
+                            motor_state.tauEst=channel
+                            # 发布消息
+                            L_toe_controller.publish(motor_state)
+                        elif i+1==8:
+                            position_value=send_state_can_messages(1,bus)
+                            speed_value=send_speed_can_messages(1,bus)
+                            effort[7]=channel
+                            motor_state.q=position_value
+                            motor_state.dq=speed_value
+                            motor_state.tauEst=channel
+                            # 发布消息
+                            R_toe_controller.publish(motor_state)                   
+                else:
+                    print("CRC校验失败")
+                    print(calculated_crc.hex().upper())
+            time.sleep(0.1)
+    except Exception:
+        print("talker error")    
 
 # 订阅者回调函数，接收来自 'csv_output' 的数据并根据需要发送 CAN 消息
-def callback(data, bus):
+def callbackR1(data, bus):
     rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
-    id =0x1
     try:
-        if id==1:
-            angles=data.q %360
-            angle_in_radians = math.radians(angles)
-            print(f"角度{angles}")
-            # 计算正弦值
-            sin_value = math.sin(angle_in_radians)
-            print(f"余弦值{sin_value}")
-            ele=0
-            if(angles <180):
-                ele = round((data.tau)*180*-11-2700*sin_value)
-            else:
-                ele = round((data.tau)*180 *-11-3000*sin_value)
-            ele_str = signed_int_to_32bit_hex(ele)
-            print(f"电流值{ele}")
+        angles=data.q %360
+        angle_in_radians = math.radians(angles)
+        print(f"角度{angles}")
+        # 计算正弦值
+        sin_value = math.sin(angle_in_radians)
+        print(f"余弦值{sin_value}")
+        ele=0
+        if(angles <180):
+            ele = round((data.tau)*180*-11-2700*sin_value)
+        else:
+            ele = round((data.tau)*180 *-11-3000*sin_value)
+        
+        print(f"电流值{ele}")
+        if data.tau<2000:
+            ele_str = signed_int_to_32bit_hex(int(data.tau))
             hex_number = int(ele_str, 16)
             temp = [0,0,0,0]    
-            temp[0] = 0xf4
-            temp[1] = 0x01
-            temp[2] = 0x00
-            temp[3] = 0x00
+            temp[0] = hex_number & 0xFF
+            temp[1] = (hex_number >> 8) & 0xFF
+            temp[2] = (hex_number >> 16) & 0xFF
+            temp[3] = (hex_number >> 24) & 0xFF
             print(f"下发数据{temp}")
             send_can_message(bus, temp,0x401)
-        if id==2:
-            angles=data.q %360
-            angle_in_radians = math.radians(angles)
-            print(f"角度{angles}")
-            # 计算正弦值
-            sin_value = math.sin(angle_in_radians)
-            print(f"余弦值{sin_value}")
-            ele=0
-            if(angles <180):
-                ele = round((data.tau)*180*-12-1500*sin_value)
-            else:
-                ele = round((data.tau)*180 *-14-1500*sin_value)
-            ele_str = signed_int_to_32bit_hex(ele)
-            print(f"电流值{ele}")
-            hex_number = int(ele_str, 16)
-            temp = [0,0,0,0]    
-            temp[0] = hex_number & 0xFF
-            temp[1] = (hex_number >> 8) & 0xFF
-            temp[2] = (hex_number >> 16) & 0xFF
-            temp[3] = (hex_number >> 24) & 0xFF
-            print(f"下发数据{temp}")
-            #send_can_message(bus, temp,id+0x200)
-        if id==3:
-            angles=data.q %360
-            angle_in_radians = math.radians(angles)
-            print(f"角度{angles}")
-            # 计算正弦值
-            sin_value = math.sin(angle_in_radians)
-            print(f"余弦值{sin_value}")
-            ele=0
-            if(angles <180):
-                ele = round((data.tau)*180*-18-3100*sin_value)
-            else:
-                ele = round((data.tau)*180 *-18-3100*sin_value)
-            ele_str = signed_int_to_32bit_hex(ele)
-            print(f"电流值{ele}")
-            hex_number = int(ele_str, 16)
-            temp = [0,0,0,0]    
-            temp[0] = hex_number & 0xFF
-            temp[1] = (hex_number >> 8) & 0xFF
-            temp[2] = (hex_number >> 16) & 0xFF
-            temp[3] = (hex_number >> 24) & 0xFF
-            print(f"下发数据{temp}")
-            #send_can_message(bus, temp,id+0x200)   
-        if id==4:
-            angles=data.q %360
-            angle_in_radians = math.radians(angles)
-            print(f"角度{angles}")
-            # 计算正弦值
-            sin_value = math.sin(angle_in_radians)
-            print(f"余弦值{sin_value}")
-            ele=0
-            if(angles <180):
-                ele = round((data.tau)*180*-14-1200*sin_value)
-            else:
-                ele = round((data.tau)*180 *-13-2000*sin_value)
-            ele_str = signed_int_to_32bit_hex(ele)
-            print(f"电流值{ele}")
-            hex_number = int(ele_str, 16)
-            temp = [0,0,0,0]    
-            temp[0] = hex_number & 0xFF
-            temp[1] = (hex_number >> 8) & 0xFF
-            temp[2] = (hex_number >> 16) & 0xFF
-            temp[3] = (hex_number >> 24) & 0xFF
-            print(f"下发数据{temp}")
-            #send_can_message(bus, temp,id+0x200)               
     except Exception as e:
         rospy.logerr(f"处理数据时出错：{e}")
 
-# 订阅者回调函数，接收来自 'csv_output' 的数据并根据需要发送 CAN 消息
-def callback1(data, bus1,id):
-    rospy.loginfo(f"接收到的 9 维数组：{data.data}")
-
+def callbackR2(data, bus):
+    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
     try:
-        if id==1:
-            angles=data.q %360
-            angle_in_radians = math.radians(angles)
-            print(f"角度{angles}")
-            # 计算正弦值
-            sin_value = math.sin(angle_in_radians)
-            print(f"余弦值{sin_value}")
-            ele=0
-            if(angles <180):
-                ele = round((data.tau)*180*-11-3600*sin_value)
-            else:
-                ele = round((data.tau)*180 *-11-3600*sin_value)
-            ele_str = signed_int_to_32bit_hex(ele)
-            print(ele_str)
+        angles=data.q %360
+        angle_in_radians = math.radians(angles)
+        print(f"角度{angles}")
+        # 计算正弦值
+        sin_value = math.sin(angle_in_radians)
+        print(f"余弦值{sin_value}")
+        ele=0
+        if(angles <180):
+            ele = round((data.tau)*180*-10-1500*sin_value)
+        else:
+            ele = round((data.tau)*180*-10-1000*sin_value)
+        ele_str = signed_int_to_32bit_hex(ele)
+        print(f"电流值{data.tau}")
+        if data.tau<2000:
+            ele_str = signed_int_to_32bit_hex(int(data.tau))
             hex_number = int(ele_str, 16)
             temp = [0,0,0,0]    
             temp[0] = hex_number & 0xFF
             temp[1] = (hex_number >> 8) & 0xFF
             temp[2] = (hex_number >> 16) & 0xFF
             temp[3] = (hex_number >> 24) & 0xFF
-            print(temp)
-            send_can_message(bus1, temp,id+0x200)
-        if id==2:
-            angles=data.q %360
-            angle_in_radians = math.radians(angles)
-            print(f"角度{angles}")
-            # 计算正弦值
-            sin_value = math.sin(angle_in_radians)
-            print(f"余弦值{sin_value}")
-            ele=0
-            if(angles <180):
-                ele = round((data.tau)*180*-12-2500*sin_value)
-            else:
-                ele = round((data.tau)*180 *-12-2400*sin_value)
-            ele_str = signed_int_to_32bit_hex(ele)
-            print(ele_str)
+            print(f"下发数据{temp}")
+            send_can_message(bus, temp,0x402)         
+    except Exception as e:
+        rospy.logerr(f"处理数据时出错：{e}")   
+
+def callbackR3(data, bus):
+    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
+    try:
+        angles=data.q %360
+        angle_in_radians = math.radians(angles)
+        print(f"角度{angles}")
+        # 计算正弦值
+        sin_value = math.sin(angle_in_radians)
+        print(f"余弦值{sin_value}")
+        ele=0
+        if(angles <180):
+            ele = round((data.tau)*180*-3-1000*sin_value)
+        else:
+            ele = round((data.tau)*180*-3-1000*sin_value)
+        ele_str = signed_int_to_32bit_hex(ele)
+        print(f"电流值{ele}")
+        if data.tau<2000:
+            ele_str = signed_int_to_32bit_hex(int(data.tau))
             hex_number = int(ele_str, 16)
             temp = [0,0,0,0]    
             temp[0] = hex_number & 0xFF
             temp[1] = (hex_number >> 8) & 0xFF
             temp[2] = (hex_number >> 16) & 0xFF
             temp[3] = (hex_number >> 24) & 0xFF
-            print(temp)
-            send_can_message(bus1, temp,id+0x200)
-        if id==3:
-            angles=data.q %360
-            angle_in_radians = math.radians(angles)
-            print(f"角度{angles}")
-            # 计算正弦值
-            sin_value = math.sin(angle_in_radians)
-            print(f"余弦值{sin_value}")
-            ele=0
-            if(angles <180):
-                ele = round((data.tau)*180*-12-3000*sin_value)
-            else:
-                ele = round((data.tau)*180 *-12-2400*sin_value)
-            ele_str = signed_int_to_32bit_hex(ele)
-            print(ele_str)
+            print(f"下发数据{temp}")
+            send_can_message(bus, temp,0x403)                
+    except Exception as e:
+        rospy.logerr(f"处理数据时出错：{e}")  
+
+def callbackR4(data, bus):
+    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
+    try:
+        angles=data.q %360
+        angle_in_radians = math.radians(angles)
+        print(f"角度{angles}")
+        # 计算正弦值
+        sin_value = math.sin(angle_in_radians)
+        print(f"余弦值{sin_value}")
+        ele=0
+        if(angles <180):
+            ele = round((data.tau)*180*-7-2000*sin_value)
+        else:
+            ele = round((data.tau)*180*-13-2000*sin_value)
+        ele_str = signed_int_to_32bit_hex(ele)
+        print(f"电流值{ele}")
+        if data.tau<2000:
+            ele_str = signed_int_to_32bit_hex(int(data.tau))
             hex_number = int(ele_str, 16)
             temp = [0,0,0,0]    
             temp[0] = hex_number & 0xFF
             temp[1] = (hex_number >> 8) & 0xFF
             temp[2] = (hex_number >> 16) & 0xFF
             temp[3] = (hex_number >> 24) & 0xFF
-            print(temp)
-            send_can_message(bus1, temp,id+0x200)   
-        if id==4:
-            angles=data.q %360
-            angle_in_radians = math.radians(angles)
-            print(f"角度{angles}")
-            # 计算正弦值
-            sin_value = math.sin(angle_in_radians)
-            print(f"余弦值{sin_value}")
-            ele=0
-            if(angles <180):
-                ele = round((data.tau)*180*-11-2300*sin_value)
-            else:
-                ele = round((data.tau)*180 *-12-2200*sin_value)
-            ele_str = signed_int_to_32bit_hex(ele)
-            print(ele_str)
+            print(f"下发数据{temp}")
+            #send_can_message(bus, temp,0x404)               
+    except Exception as e:
+        rospy.logerr(f"处理数据时出错：{e}")                   
+
+def callbackL1(data, bus1):
+    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
+    try:
+        angles=data.q %360
+        angle_in_radians = math.radians(angles)
+        print(f"角度{angles}")
+        # 计算正弦值
+        sin_value = math.sin(angle_in_radians)
+        print(f"余弦值{sin_value}")
+        ele=0
+        if(angles <180):
+            ele = round((data.tau)*180*-11-3600*sin_value)
+        else:
+            ele = round((data.tau)*180 *-11-3600*sin_value)
+        ele_str = signed_int_to_32bit_hex(ele)
+        print(ele_str)
+        if data.tau<2000:
+            ele_str = signed_int_to_32bit_hex(int(data.tau))
             hex_number = int(ele_str, 16)
             temp = [0,0,0,0]    
             temp[0] = hex_number & 0xFF
             temp[1] = (hex_number >> 8) & 0xFF
             temp[2] = (hex_number >> 16) & 0xFF
             temp[3] = (hex_number >> 24) & 0xFF
-            print(temp)
-            send_can_message(bus1, temp,id+0x200)               
+            print(f"下发数据{temp}")
+            send_can_message(bus1, temp,0x401)             
+    except Exception as e:
+        rospy.logerr(f"处理数据时出错：{e}")
+
+def callbackL2(data, bus1):
+    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
+    try:
+        angles=data.q %360
+        angle_in_radians = math.radians(angles)
+        print(f"角度{angles}")
+        # 计算正弦值
+        sin_value = math.sin(angle_in_radians)
+        print(f"余弦值{sin_value}")
+        ele=0
+        if(angles <180):
+            ele = round((data.tau)*180*-12-2500*sin_value)
+        else:
+            ele = round((data.tau)*180 *-12-2400*sin_value)
+        ele_str = signed_int_to_32bit_hex(ele)
+        print(ele_str)
+        if data.tau<2000:
+            ele_str = signed_int_to_32bit_hex(int(data.tau))
+            hex_number = int(ele_str, 16)
+            temp = [0,0,0,0]    
+            temp[0] = hex_number & 0xFF
+            temp[1] = (hex_number >> 8) & 0xFF
+            temp[2] = (hex_number >> 16) & 0xFF
+            temp[3] = (hex_number >> 24) & 0xFF
+            print(f"下发数据{temp}")
+            send_can_message(bus1, temp,0x402)               
+    except Exception as e:
+        rospy.logerr(f"处理数据时出错：{e}")
+
+def callbackL3(data, bus1):
+    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
+    try:
+        angles=data.q %360
+        angle_in_radians = math.radians(angles)
+        print(f"角度{angles}")
+        # 计算正弦值
+        sin_value = math.sin(angle_in_radians)
+        print(f"余弦值{sin_value}")
+        ele=0
+        if(angles <180):
+            ele = round((data.tau)*180*-12-3000*sin_value)
+        else:
+            ele = round((data.tau)*180 *-12-2400*sin_value)
+        ele_str = signed_int_to_32bit_hex(ele)
+        print(ele_str)
+        if data.tau<2000:
+            ele_str = signed_int_to_32bit_hex(int(data.tau))
+            hex_number = int(ele_str, 16)
+            temp = [0,0,0,0]    
+            temp[0] = hex_number & 0xFF
+            temp[1] = (hex_number >> 8) & 0xFF
+            temp[2] = (hex_number >> 16) & 0xFF
+            temp[3] = (hex_number >> 24) & 0xFF
+            print(f"下发数据{temp}")
+            send_can_message(bus1, temp,0x403)               
+    except Exception as e:
+        rospy.logerr(f"处理数据时出错：{e}")
+
+def callbackL4(data, bus1):
+    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
+    try:
+        angles=data.q %360
+        angle_in_radians = math.radians(angles)
+        print(f"角度{angles}")
+        # 计算正弦值
+        sin_value = math.sin(angle_in_radians)
+        print(f"余弦值{sin_value}")
+        ele=0
+        if(angles <180):
+            ele = round((data.tau)*180*-11-2300*sin_value)
+        else:
+            ele = round((data.tau)*180 *-12-2200*sin_value)
+        ele_str = signed_int_to_32bit_hex(ele)
+        print(ele_str)
+        if data.tau<2000:
+            ele_str = signed_int_to_32bit_hex(int(data.tau))
+            hex_number = int(ele_str, 16)
+            temp = [0,0,0,0]    
+            temp[0] = hex_number & 0xFF
+            temp[1] = (hex_number >> 8) & 0xFF
+            temp[2] = (hex_number >> 16) & 0xFF
+            temp[3] = (hex_number >> 24) & 0xFF
+            print(f"下发数据{temp}")
+            #send_can_message(bus1, temp,0x404)               
     except Exception as e:
         rospy.logerr(f"处理数据时出错：{e}")        
 
@@ -349,91 +490,25 @@ def send_can_message(bus, message_data,canid):
 
 
 def main():
+    rospy.init_node('csv_force_control', anonymous=True)
     # 设置 CAN 接口，假设使用的是 'can0' 接口
     bus = can.interface.Bus(channel='can1', interface='socketcan', fd=True)
-    rospy.init_node('csv_force_control', anonymous=True)
-    # 启动 ROS 订阅者和 CAN 发送功能
-    print("bus:",bus)
+    bus1 = can.interface.Bus(channel='can0', interface='socketcan', fd=True)
     # 调用发送函数
     send_initial_can_messages(bus)  # 在主线程中执行发送操作
-    L_calf_controller = rospy.Publisher('/exo_humanoid_gazebo/L_calf_controller/state', MotorState, queue_size=10)
-    L_hip_controller = rospy.Publisher('/exo_humanoid_gazebo/L_hip_controller/state', MotorState, queue_size=10)
-    L_hip2_controller = rospy.Publisher('/exo_humanoid_gazebo/L_hip2_controller/state', MotorState, queue_size=10)
-    L_toe_controller = rospy.Publisher('/exo_humanoid_gazebo/L_toe_controller/state', MotorState, queue_size=10)
-    #bus1 = can.interface.Bus(channel='can0', interface='socketcan', fd=True)
-  
-    # motor_state = MotorState()
-    # ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
-    # request_data = bytes.fromhex('01 03 00 00 00 10 44 06')
-    # while True:
-    #     ser.write(request_data)
-    #     response = ser.read(37)
-    #     if len(response) == 37:
-    #         received_crc = response[-2:]
-    #         calculated_crc = calculate_crc(response[:-2]).to_bytes(2, byteorder='little')
-    #         if received_crc == calculated_crc:
-    #             channels = parse_data(response)
-    #             for i, channel in enumerate(channels):
-    #                 if i+1==1:
-    #                     #send_state_can_messages(3,bus1)
-    #                     #send_speed_can_messages(3,bus1)
-    #                     effort[1]=channel
-    #                 elif i+1==2:
-    #                     position_value=send_state_can_messages(2,bus)
-    #                     speed_value=send_speed_can_messages(2,bus)
-    #                     effort[6]=channel
-    #                     motor_state.q=position_value
-    #                     motor_state.dq=speed_value
-    #                     motor_state.tauEst=channel
-    #                     # 发布消息
-    #                     L_calf_controller.publish(motor_state)
-    #                 elif i+1==3:
-    #                     position_value=send_state_can_messages(4,bus)
-    #                     speed_value=send_speed_can_messages(4,bus)
-    #                     effort[4]=channel
-    #                     motor_state.q=position_value
-    #                     motor_state.dq=speed_value
-    #                     motor_state.tauEst=channel
-    #                     # 发布消息
-    #                     L_hip_controller.publish(motor_state)
-    #                 elif i+1==4:
-    #                     #send_state_can_messages(4,bus1)
-    #                     #send_speed_can_messages(4,bus1)
-    #                     effort[0]=channel
-    #                 elif i+1==5:
-    #                     position_value=send_state_can_messages(3,bus)
-    #                     speed_value=send_speed_can_messages(3,bus)
-    #                     effort[5]=channel
-                        
-    #                     motor_state.q=position_value
-    #                     motor_state.dq=speed_value
-    #                     motor_state.tauEst=channel
-    #                     # 发布消息
-    #                     L_hip2_controller.publish(motor_state)
-    #                 elif i+1==6:
-    #                     #send_state_can_messages(2,bus1)
-    #                     #send_speed_can_messages(2,bus1)
-    #                     effort[2]=channel
-    #                 elif i+1==7:
-    #                     #send_state_can_messages(1,bus1)
-    #                     #send_speed_can_messages(1,bus1)
-    #                     effort[3]=channel
-    #                 elif i+1==8:
-    #                     send_state_can_messages(1,bus)
-    #                     send_speed_can_messages(1,bus)
-    #                     effort[7]=channel
-    #                     motor_state.q=position_value
-    #                     motor_state.dq=speed_value
-    #                     motor_state.tauEst=channel
-    #                     # 发布消息
-    #                     L_toe_controller.publish(motor_state)                   
-    #         else:
-    #             print("CRC校验失败")
-    #             print(calculated_crc.hex().upper())
-    #     time.sleep(0.5)
-    #     break
+    send_initial_can_messages(bus1)  # 在主线程中执行发送操作
 
-    listener(bus)
-  
+        # 创建并启动接收线程
+    listener_thread = threading.Thread(target=listener, args=(bus,bus1,))
+    listener_thread.start()
+
+    talker_thread = threading.Thread(target=talker, args=(bus,bus1,))
+    talker_thread.start()
+
+    rospy.spin()  # 保持节点活跃，等待消息回调
+    
+
+
+
 if __name__ == "__main__":
     main()
