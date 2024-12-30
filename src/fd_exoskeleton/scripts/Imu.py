@@ -152,7 +152,7 @@ def receive_data(publisher,imu_states_publisher):
             msgImuStatus.linear_acceleration.z = linear_acceleration_z
 
             imu_states_publisher.publish(msgImuStatus)
-            # print("imu_states_publisher")
+            print("imu_states_publisher")
 
         # 读取并解析AHRS数据
         elif head_type == TYPE_AHRS:
@@ -199,9 +199,10 @@ def receive_data(publisher,imu_states_publisher):
 #         exit(1)
 
 def main():
-    publisher = rospy.Publisher('/cmd_imu', CmdMessage, queue_size=10)
-    imu_states_publisher = rospy.Publisher('/imu_state', Imu, queue_size=10)
+   
     rospy.init_node('imu_node', anonymous=True)
+    publisher = rospy.Publisher('/cmd_imu', CmdMessage, queue_size=10)
+    imu_states_publisher = rospy.Publisher('/gazebo/imu_state', Imu, queue_size=10)
     # open_port()  # 打开串口
     tr = threading.Thread(target=receive_data, args=(publisher,imu_states_publisher,))
     tr.daemon = True  # 将线程设为守护线程

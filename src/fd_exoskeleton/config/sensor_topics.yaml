@@ -15,33 +15,33 @@ IP:
 ####### Send these ROS messages to remote robots #######
 ## if no send_topics needed, comment all these out
 send_topics:
-- topic_name: /imu_state # send the messages of this ROS topic
+- topic_name: /gazebo/imu_state # send the messages of this ROS topic
   msg_type: sensor_msgs/Imu # ROS message type (rosmsg style)
   max_freq: 1000 # max sending frequency (Hz) int
   srcIP: self # self IP
-  srcPort: 3001 # ports of send_topics should be different
+  srcPort: 4001 # ports of send_topics should be different
 
 - topic_name: /cmd_vel # send the messages of this ROS topic
   msg_type: geometry_msgs/Twist # ROS message type (rosmsg style)
-  max_freq: 50 # max sending frequency (Hz) int
+  max_freq: 1000 # max sending frequency (Hz) int
   srcIP: self # self IP
   srcPort: 3002 # ports of send_topics should be different
 
 - topic_name: /string # send the messages of this ROS topic
   msg_type: std_msgs/String # ROS message type (rosmsg style)
-  max_freq: 10 # max sending frequency (Hz) int
+  max_freq: 1000 # max sending frequency (Hz) int
   srcIP: self # self IP
   srcPort: 3003 # ports of send_topics should be different
 
 - topic_name: /cmd_lida # send the messages of this ROS topic
   msg_type: fd_exoskeleton/CmdMessage # ROS message type (rosmsg style)
-  max_freq: 10 # max sending frequency (Hz) int
+  max_freq: 1000 # max sending frequency (Hz) int
   srcIP: self # self IP
   srcPort: 3004 # ports of send_topics should be different
 
 - topic_name: /cmd_imu # send the messages of this ROS topic
   msg_type: fd_exoskeleton/CmdMessage # ROS message type (rosmsg style)
-  max_freq: 10 # max sending frequency (Hz) int
+  max_freq: 1000 # max sending frequency (Hz) int
   srcIP: self # self IP
   srcPort: 3005 # ports of send_topics should be different
 
@@ -55,10 +55,10 @@ send_topics:
 ####### receive these ROS messages from remote robots #######
 ## if no recv_topics needed, comment all these out
 recv_topics:
-- topic_name: /gazebo/imu_state # the received messages will be published in this topic
-  msg_type: sensor_msgs/Imu # ROS message type (rosmsg style)
-  srcIP: main # message source IPname
-  srcPort: 3001 # message source port
+# - topic_name: /gazebo/imu_state # the received messages will be published in this topic
+#   msg_type: sensor_msgs/Imu # ROS message type (rosmsg style)
+#   srcIP: main # message source IPname
+#   srcPort: 3001 # message source port
 
 - topic_name: /cmd_vel_recv # the received messages will be published in this topic
   msg_type: geometry_msgs/Twist # ROS message type (rosmsg style)
@@ -73,13 +73,11 @@ recv_topics:
 
 - topic_name: /cmd_lida_recv # send the messages of this ROS topic
   msg_type: fd_exoskeleton/CmdMessage # ROS message type (rosmsg style)
-  max_freq: 10 # max sending frequency (Hz) int
   srcIP: main #   srcIP: joint  message source IPname
   srcPort: 3004 # ports of send_topics should be different
 
 - topic_name: /cmd_imu_recv # send the messages of this ROS topic
   msg_type: fd_exoskeleton/CmdMessage # ROS message type (rosmsg style)
-  max_freq: 10 # max sending frequency (Hz) int
   srcIP: joint #   srcIP: joint  message source IPname
   srcPort: 3005 # ports of send_topics should be different
 
