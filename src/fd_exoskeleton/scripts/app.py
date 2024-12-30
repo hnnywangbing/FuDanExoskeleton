@@ -3,13 +3,17 @@ import rospy
 import zmq
 from std_msgs.msg import String
 from fd_exoskeleton.msg import CmdMessage
+from unitree_legged_msgs.msg import MotorCmd, MotorState
 import threading
 import struct
 import time
 import traceback
 from queue import Queue
 # 消息队列
-message_queue = Queue()
+message_queue = Queue(1)
+
+L_calf_effort = 0 
+R_calf_effort = 0
 # 服务端处理客户端请求的函数
 def handle_requests(context,rosPub):
     # 创建一个 REP socket
@@ -47,26 +51,46 @@ def publish_updates(context):
                 publisher.send_string(message)
         except Exception as e:
             traceback.print_exc()   
-
-def callback(data):
+def callback_L_calf_controller(data):
      try:
-        print("cmd:",data.cmd)
-        if  data.cmd:
-            if "Sitdown" in data.cmd:
-                message_queue.put("NO_Chair")
-            else :
-                message_queue.put(data.cmd)
+         L_calf_effort=data.tauEst
      except Exception as e:
             traceback.print_exc()
 
+def callback_R_calf_controller(data):
+     try:
+         R_calf_effort=data.tauEst
+     except Exception as e:
+            traceback.print_exc()
+def callbackLida(data):
+     try:
+        if L_calf_effort> 600 or L_calf_effort<400 and R_calf_effort< 600 and R_calf_effort>400: #根据实际情况调整
+            if  data.value>400: #椅子检测高度大于400,根据实际情况调整
+                message_queue.put("NO_Chair")
+     except Exception as e:
+            traceback.print_exc()
+
+
+def callbackString_recv(data):
+     try:
+        message_queue.put(data.data)
+     except Exception as e:
+            traceback.print_exc()
 # 主函数
 def main():
     # 在 ROS 中，节点名称唯一。如果启动两个同名节点，第一个会被关闭。
     # anonymous=True 标志意味着 rospy 将为节点选择一个唯一的名称，允许多个监听器同时运行。
     rospy.init_node('app_server_node', anonymous=True)
     rosPub = rospy.Publisher('AppCmd', String, queue_size=10) # mpc 接收 app端控制命令
-    # 订阅 'chatter_recv' 话题，接收 String 类型的消息，并调用回调函数
-    rospy.Subscriber('/cmd', CmdMessage, callback)
+    #订阅关节电机力矩值
+    rospy.Subscriber('/exo_humanoid_gazebo/L_calf_controller/state',MotorState, callback_L_calf_controller)
+    rospy.Subscriber('/exo_humanoid_gazebo/R_calf_controller/state',MotorState, callback_R_calf_controller)
+
+    # 订阅 'cmd_lida_recv' 话题，接收 String 类型的消息，并调用回调函数
+    rospy.Subscriber('/cmd_lida_recv', CmdMessage, callbackLida)
+
+        # 订阅 'chatter_recv' 话题，接收 String 类型的消息，并调用回调函数
+    rospy.Subscriber('/string_recv', String, callbackString_recv)
 
     context = zmq.Context()
 
