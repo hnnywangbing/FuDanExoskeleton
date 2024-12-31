@@ -87,7 +87,7 @@ def main():
     rospy.Subscriber('/exo_humanoid_gazebo/R_calf_controller/state',MotorState, callback_R_calf_controller)
 
     # 订阅 'cmd_lida_recv' 话题，接收 String 类型的消息，并调用回调函数
-    rospy.Subscriber('/cmd_lida_recv', CmdMessage, callbackLida)
+    rospy.Subscriber('/cmd_lida', CmdMessage, callbackLida)
 
         # 订阅 'chatter_recv' 话题，接收 String 类型的消息，并调用回调函数
     rospy.Subscriber('/string_recv', String, callbackString_recv)

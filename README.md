@@ -41,7 +41,7 @@ config/joint_topics.yaml
 
 # python 存放位置 scripts CMakeLists.txt install 添加安装python脚本
 
-# 配置传感器端口：查看端口ls /dev/ttyUSB*
+# 配置传感器端口：查看端口 ls /dev/ttyUSB*
 # 端口授权
 sudo chmod 666 /dev/ttyUSB0 # Imu 注意 重新插拔端口会变 
 sudo chmod 666 /dev/ttyUSB1 # lida
