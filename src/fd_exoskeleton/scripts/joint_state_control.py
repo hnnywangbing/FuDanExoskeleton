@@ -3,12 +3,14 @@ import rospy
 from sensor_msgs.msg import JointState
 from unitree_legged_msgs.msg import MotorCmd
 from sensor_msgs.msg import Imu
+from unitree_legged_msgs.msg import MotorCmd
+from sensor_msgs.msg import Imu
 def talker():
     # 初始化节点
     rospy.init_node('joint_state_publisher', anonymous=True)
     
     # 创建一个发布者，发布到'/JointState'话题
-    pub = rospy.Publisher('/imu_state_main', Imu, queue_size=10)
+    pub = rospy.Publisher('/imu_state_sensor', Imu, queue_size=10)
     
     # 设置发布频率（例如，每秒10次）
     rate = rospy.Rate(10) 
@@ -46,10 +48,10 @@ def talker():
         pub.publish(joint_state)
         
         # 打印关节位置（可选）
-        # print(joint_state.position)
+        print(joint_state.orientation.w)
         
         # 按照设定的频率休眠
-        rate.sleep()
+        # rate.sleep()
 
 if __name__ == '__main__':
     try:
