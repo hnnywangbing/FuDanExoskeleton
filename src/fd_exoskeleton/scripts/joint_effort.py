@@ -14,6 +14,8 @@ from unitree_legged_msgs.msg import MotorCmd, MotorState
 
 #先在命令行众配置 can0
 # sudo ip link set can1 up type can bitrate 1000000 dbitrate 5000000 restart-ms 1000 sample-point 0.8 dsample-point 0.75 berr-reporting on fd on
+# sudo ip link set can0 up type can bitrate 1000000 dbitrate 5000000 restart-ms 1000 sample-point 0.8 dsample-point 0.75 berr-reporting on fd on
+
 # 参考  https://zhuanlan.zhihu.com/p/11384593589
 
 name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'joint7', 'joint8']
@@ -64,9 +66,6 @@ def send_initial_can_messages(bus):
             message=bus.recv()
             if message:
                 print(f"Message received: {message}")
-                # 访问消息的各个属性
-                arbitration_id=hex(message.arbitration_id)
-                hex_str = binascii.hexlify(message.data).decode('utf-8')
             time.sleep(0.3)
         
     except can.CanError:
@@ -87,6 +86,7 @@ def send_state_can_messages(id,bus):
                 signed_value=get_position_value(message.data)
                 print(f"signed_position_value: {signed_value}")
                 return round(signed_value/10000,2)
+        time.sleep(0.01)
     except can.CanError:
         print("Failed to send initialization CAN messages")  
 
@@ -104,13 +104,14 @@ def send_speed_can_messages(id,bus):
                 signed_value=get_velocity_value(message.data)
                 print(f"signed_velocity_value: {signed_value}")
                 return signed_value
+        time.sleep(0.01)
     except can.CanError:
         print("Failed to send initialization CAN messages")    
 
 def get_position_value(data):
     extracted_bytes = data[8:12]
     reversed_bytes = extracted_bytes[::-1]
-    hex_str = ''.join(f'{byte:02x}' for byte in reversed_bytes)                
+    hex_str = ''.join(f'{byte:02x}' for byte in reversed_bytes)               
     bytes_data = bytes.fromhex(hex_str)
     signed_value = struct.unpack('>i', bytes_data)[0]
     return signed_value
@@ -125,20 +126,23 @@ def get_velocity_value(data):
 
 
 
-def listener(bus,bus1):
+def listenerR(bus):
     print("启动了")
     # 订阅 'csv_output' 话题，消息类型为 Float64MultiArray
     rospy.Subscriber('/exo_humanoid_gazebo/R_calf_controller/command', MotorCmd, callbackR2, callback_args=bus)
-    rospy.Subscriber('/exo_humanoid_gazebo/R_hip2_controller/command', MotorCmd, callbackR3, callback_args=bus)
-    rospy.Subscriber('/exo_humanoid_gazebo/R_hip_controller/command', MotorCmd, callbackR4, callback_args=bus)
+    #rospy.Subscriber('/exo_humanoid_gazebo/R_hip2_controller/command', MotorCmd, callbackR3, callback_args=bus)
+    #rospy.Subscriber('/exo_humanoid_gazebo/R_hip_controller/command', MotorCmd, callbackR4, callback_args=bus)
     rospy.Subscriber('/exo_humanoid_gazebo/R_toe_controller/command', MotorCmd, callbackR1,callback_args=bus)
+
+def listenerL(bus1):
     rospy.Subscriber('/exo_humanoid_gazebo/L_calf_controller/command', MotorCmd, callbackL2, callback_args=bus1)
-    rospy.Subscriber('/exo_humanoid_gazebo/L_hip2_controller/command', MotorCmd, callbackL3, callback_args=bus1)
-    rospy.Subscriber('/exo_humanoid_gazebo/L_hip_controller/command', MotorCmd, callbackL4, callback_args=bus1)
-    rospy.Subscriber('/exo_humanoid_gazebo/L_toe_controller/command', MotorCmd, callbackL1, callback_args=bus1)
+    #rospy.Subscriber('/exo_humanoid_gazebo/L_hip2_controller/command', MotorCmd, callbackL3, callback_args=bus1)
+    #rospy.Subscriber('/exo_humanoid_gazebo/L_hip_controller/command', MotorCmd, callbackL4, callback_args=bus1)
+    rospy.Subscriber('/exo_humanoid_gazebo/L_toe_controller/command', MotorCmd, callbackL1, callback_args=bus1)    
 
 #
 def talker(bus,bus1):
+    # 调用发送函数
     motor_state = MotorState()
     R_calf_controller = rospy.Publisher('/exo_humanoid_gazebo/R_calf_controller/state', MotorState, queue_size=10)
     R_hip_controller = rospy.Publisher('/exo_humanoid_gazebo/R_hip_controller/state', MotorState, queue_size=10)
@@ -162,23 +166,23 @@ def talker(bus,bus1):
                     for i, channel in enumerate(channels):
                         print(f"通道{i + 1}：{channel}")
                         if i+1==1:
-                            position_value=send_state_can_messages(3,bus1)
-                            speed_value=send_speed_can_messages(3,bus1)
+                            position_value=send_state_can_messages(3,bus)
+                            speed_value=send_speed_can_messages(3,bus)
                             effort[1]=channel
                             motor_state.q=position_value
                             motor_state.dq=speed_value
                             motor_state.tauEst=channel
                             # 发布消息
-                            L_hip2_controller.publish(motor_state)
+                            R_hip2_controller.publish(motor_state)
                         elif i+1==2:
-                            position_value=send_state_can_messages(2,bus)
-                            speed_value=send_speed_can_messages(2,bus)
+                            position_value=send_state_can_messages(2,bus1)
+                            speed_value=send_speed_can_messages(2,bus1)
                             effort[6]=channel
                             motor_state.q=position_value
                             motor_state.dq=speed_value
                             motor_state.tauEst=channel
                             # 发布消息
-                            R_calf_controller.publish(motor_state)
+                            L_calf_controller.publish(motor_state)
                         elif i+1==3:
                             position_value=send_state_can_messages(4,bus)
                             speed_value=send_speed_can_messages(4,bus)
@@ -198,51 +202,51 @@ def talker(bus,bus1):
                             # 发布消息
                             L_hip_controller.publish(motor_state)
                         elif i+1==5:
-                            position_value=send_state_can_messages(3,bus)
-                            speed_value=send_speed_can_messages(3,bus)
+                            position_value=send_state_can_messages(3,bus1)
+                            speed_value=send_speed_can_messages(3,bus1)
                             effort[5]=channel
                             motor_state.q=position_value
                             motor_state.dq=speed_value
                             motor_state.tauEst=channel
                             # 发布消息
-                            R_hip2_controller.publish(motor_state)
+                            L_hip2_controller.publish(motor_state)
                         elif i+1==6:
-                            position_value=send_state_can_messages(2,bus1)
-                            speed_value=send_speed_can_messages(2,bus1)
+                            position_value=send_state_can_messages(2,bus)
+                            speed_value=send_speed_can_messages(2,bus)
                             effort[2]=channel
                             motor_state.q=position_value
                             motor_state.dq=speed_value
                             motor_state.tauEst=channel
                             # 发布消息
-                            L_calf_controller.publish(motor_state)
+                            R_calf_controller.publish(motor_state)
                         elif i+1==7:
-                            position_value=send_state_can_messages(1,bus1)
-                            speed_value=send_speed_can_messages(1,bus1)
+                            position_value=send_state_can_messages(1,bus)
+                            speed_value=send_speed_can_messages(1,bus)
                             effort[3]=channel
                             motor_state.q=position_value
                             motor_state.dq=speed_value
                             motor_state.tauEst=channel
                             # 发布消息
-                            L_toe_controller.publish(motor_state)
+                            R_toe_controller.publish(motor_state)
                         elif i+1==8:
-                            position_value=send_state_can_messages(1,bus)
-                            speed_value=send_speed_can_messages(1,bus)
+                            position_value=send_state_can_messages(1,bus1)
+                            speed_value=send_speed_can_messages(1,bus1)
                             effort[7]=channel
                             motor_state.q=position_value
                             motor_state.dq=speed_value
                             motor_state.tauEst=channel
                             # 发布消息
-                            R_toe_controller.publish(motor_state)                   
+                            L_toe_controller.publish(motor_state)                   
                 else:
                     print("CRC校验失败")
                     print(calculated_crc.hex().upper())
             time.sleep(0.1)
-    except Exception:
-        print("talker error")    
+    except Exception as e:
+        rospy.logerr(f"talker error:{e}")   
 
 # 订阅者回调函数，接收来自 'csv_output' 的数据并根据需要发送 CAN 消息
 def callbackR1(data, bus):
-    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
+    rospy.loginfo(f"r1接收到的 9 维数组：{data.tau}")
     try:
         angles=data.q %360
         angle_in_radians = math.radians(angles)
@@ -257,8 +261,8 @@ def callbackR1(data, bus):
             ele = round((data.tau)*180 *-11-3000*sin_value)
         
         print(f"电流值{ele}")
-        if data.tau<2000:
-            ele_str = signed_int_to_32bit_hex(int(data.tau))
+        if abs(data.tau)<99999:
+            ele_str = signed_int_to_32bit_hex(int(-data.tau))
             hex_number = int(ele_str, 16)
             temp = [0,0,0,0]    
             temp[0] = hex_number & 0xFF
@@ -271,7 +275,7 @@ def callbackR1(data, bus):
         rospy.logerr(f"处理数据时出错：{e}")
 
 def callbackR2(data, bus):
-    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
+    rospy.loginfo(f"r2接收到的 9 维数组：{data.tau}")
     try:
         angles=data.q %360
         angle_in_radians = math.radians(angles)
@@ -286,8 +290,8 @@ def callbackR2(data, bus):
             ele = round((data.tau)*180*-10-1000*sin_value)
         ele_str = signed_int_to_32bit_hex(ele)
         print(f"电流值{data.tau}")
-        if data.tau<2000:
-            ele_str = signed_int_to_32bit_hex(int(data.tau))
+        if abs(data.tau)<99999:
+            ele_str = signed_int_to_32bit_hex(int(-data.tau*0.3))
             hex_number = int(ele_str, 16)
             temp = [0,0,0,0]    
             temp[0] = hex_number & 0xFF
@@ -300,7 +304,7 @@ def callbackR2(data, bus):
         rospy.logerr(f"处理数据时出错：{e}")   
 
 def callbackR3(data, bus):
-    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
+    rospy.loginfo(f"r3接收到的 9 维数组：{data.tau}")
     try:
         angles=data.q %360
         angle_in_radians = math.radians(angles)
@@ -315,7 +319,7 @@ def callbackR3(data, bus):
             ele = round((data.tau)*180*-3-1000*sin_value)
         ele_str = signed_int_to_32bit_hex(ele)
         print(f"电流值{ele}")
-        if data.tau<2000:
+        if abs(data.tau)<99999:
             ele_str = signed_int_to_32bit_hex(int(data.tau))
             hex_number = int(ele_str, 16)
             temp = [0,0,0,0]    
@@ -329,7 +333,7 @@ def callbackR3(data, bus):
         rospy.logerr(f"处理数据时出错：{e}")  
 
 def callbackR4(data, bus):
-    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
+    rospy.loginfo(f"r4接收到的 9 维数组：{data.tau}")
     try:
         angles=data.q %360
         angle_in_radians = math.radians(angles)
@@ -344,7 +348,7 @@ def callbackR4(data, bus):
             ele = round((data.tau)*180*-13-2000*sin_value)
         ele_str = signed_int_to_32bit_hex(ele)
         print(f"电流值{ele}")
-        if data.tau<2000:
+        if abs(data.tau)<99999:
             ele_str = signed_int_to_32bit_hex(int(data.tau))
             hex_number = int(ele_str, 16)
             temp = [0,0,0,0]    
@@ -358,7 +362,7 @@ def callbackR4(data, bus):
         rospy.logerr(f"处理数据时出错：{e}")                   
 
 def callbackL1(data, bus1):
-    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
+    rospy.loginfo(f"l1接收到的 9 维数组：{data.tau}")
     try:
         angles=data.q %360
         angle_in_radians = math.radians(angles)
@@ -373,8 +377,8 @@ def callbackL1(data, bus1):
             ele = round((data.tau)*180 *-11-3600*sin_value)
         ele_str = signed_int_to_32bit_hex(ele)
         print(ele_str)
-        if data.tau<2000:
-            ele_str = signed_int_to_32bit_hex(int(data.tau))
+        if abs(data.tau)<99999:
+            ele_str = signed_int_to_32bit_hex(int(-data.tau))
             hex_number = int(ele_str, 16)
             temp = [0,0,0,0]    
             temp[0] = hex_number & 0xFF
@@ -387,7 +391,7 @@ def callbackL1(data, bus1):
         rospy.logerr(f"处理数据时出错：{e}")
 
 def callbackL2(data, bus1):
-    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
+    rospy.loginfo(f"l2接收到的 9 维数组：{data.tau}")
     try:
         angles=data.q %360
         angle_in_radians = math.radians(angles)
@@ -402,8 +406,8 @@ def callbackL2(data, bus1):
             ele = round((data.tau)*180 *-12-2400*sin_value)
         ele_str = signed_int_to_32bit_hex(ele)
         print(ele_str)
-        if data.tau<2000:
-            ele_str = signed_int_to_32bit_hex(int(data.tau))
+        if abs(data.tau)<99999:
+            ele_str = signed_int_to_32bit_hex(int(-data.tau*0.3))
             hex_number = int(ele_str, 16)
             temp = [0,0,0,0]    
             temp[0] = hex_number & 0xFF
@@ -416,7 +420,7 @@ def callbackL2(data, bus1):
         rospy.logerr(f"处理数据时出错：{e}")
 
 def callbackL3(data, bus1):
-    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
+    rospy.loginfo(f"l3接收到的 9 维数组：{data.tau}")
     try:
         angles=data.q %360
         angle_in_radians = math.radians(angles)
@@ -431,7 +435,7 @@ def callbackL3(data, bus1):
             ele = round((data.tau)*180 *-12-2400*sin_value)
         ele_str = signed_int_to_32bit_hex(ele)
         print(ele_str)
-        if data.tau<2000:
+        if abs(data.tau)<99999:
             ele_str = signed_int_to_32bit_hex(int(data.tau))
             hex_number = int(ele_str, 16)
             temp = [0,0,0,0]    
@@ -445,7 +449,7 @@ def callbackL3(data, bus1):
         rospy.logerr(f"处理数据时出错：{e}")
 
 def callbackL4(data, bus1):
-    rospy.loginfo(f"接收到的 9 维数组：{data.tau}")
+    rospy.loginfo(f"l4接收到的 9 维数组：{data.tau}")
     try:
         angles=data.q %360
         angle_in_radians = math.radians(angles)
@@ -460,8 +464,8 @@ def callbackL4(data, bus1):
             ele = round((data.tau)*180 *-12-2200*sin_value)
         ele_str = signed_int_to_32bit_hex(ele)
         print(ele_str)
-        if data.tau<2000:
-            ele_str = signed_int_to_32bit_hex(int(data.tau))
+        if abs(data.tau)<99999:
+            ele_str = signed_int_to_32bit_hex(int(-data.tau))
             hex_number = int(ele_str, 16)
             temp = [0,0,0,0]    
             temp[0] = hex_number & 0xFF
@@ -494,16 +498,24 @@ def main():
     # 设置 CAN 接口，假设使用的是 'can0' 接口
     bus = can.interface.Bus(channel='can1', interface='socketcan', fd=True)
     bus1 = can.interface.Bus(channel='can0', interface='socketcan', fd=True)
-    # 调用发送函数
+
     send_initial_can_messages(bus)  # 在主线程中执行发送操作
     send_initial_can_messages(bus1)  # 在主线程中执行发送操作
 
-        # 创建并启动接收线程
-    listener_thread = threading.Thread(target=listener, args=(bus,bus1,))
-    listener_thread.start()
+     # 创建并启动接收线程
+    listenerR_thread = threading.Thread(target=listenerR, args=(bus,))
+    listenerR_thread.start()
 
+    listenerL_thread = threading.Thread(target=listenerL, args=(bus1,))
+    listenerL_thread.start()
+    
     talker_thread = threading.Thread(target=talker, args=(bus,bus1,))
     talker_thread.start()
+
+   
+
+    
+    
 
     rospy.spin()  # 保持节点活跃，等待消息回调
     
