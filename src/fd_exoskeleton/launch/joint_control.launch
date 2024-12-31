@@ -8,4 +8,6 @@
   <node pkg="fd_exoskeleton" type="fall_dowcn.py" name="joint_position_node" output="screen"/>
   <!-- 启动 joint effort 服务 Python节点 -->
   <node pkg="fd_exoskeleton" type="joint_effort.py" name="joint_effort_node" output="screen"/>
+   <!-- 启动 助力 服务 Python节点 -->
+  <!-- <node pkg="fd_exoskeleton" type="assist_effort.py" name="joint_effort_node" output="screen"/> -->
 </launch>

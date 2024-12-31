@@ -4,7 +4,7 @@
   <node pkg="fd_exoskeleton" type="bridge_node" name="fd_exoskeleton" output="screen" >
     <rosparam command="load" file="$(find fd_exoskeleton)/config/main_topics.yaml" />
   </node>
-   <!-- 启动 app 服务 Python节点 -->
+   <!-- 启动 realsense 节点 -->
   <node pkg="fd_exoskeleton" type="realsense.py" name="realsense_node" output="screen"/>
   <!-- 启动 app 服务 Python节点 -->
   <node pkg="fd_exoskeleton" type="app.py" name="app_server_node" output="screen"/>
